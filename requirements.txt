@@ -1,0 +1,8 @@
+dash
+numpy
+pandas
+plotly
+pyodbc
+gunicorn
+dash-bootstrap-components
+dash-table
