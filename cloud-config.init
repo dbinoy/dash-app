@@ -16,8 +16,8 @@ runcmd:
   - source ~/.bashrc
   - apt-get install -y unixodbc-dev
   - cd /home/azureuser
-  - git clone https://github.com/dbinoy/DashServer.git
-  - cd DashServer
+  - git clone https://github.com/dbinoy/dash-app.git
+  - cd dash-app
   - python3 -m venv dashenv
   - /bin/bash -c "source dashenv/bin/activate && pip3 install -r requirements.txt" 
   - cd src 
