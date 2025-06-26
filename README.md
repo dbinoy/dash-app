@@ -13,7 +13,6 @@ user-login-telemetry-dash-app
 │   │   ├── summary_cards.py       # Summary cards displaying key metrics
 │   │   ├── weekly_login_trends.py # Chart for weekly login trends
 │   │   ├── app_usage_by_office.py# Chart for application usage by office
-│   │   ├── office_engagement_heatmap.py # Heatmap for user engagement levels
 │   │   ├── user_activity_distribution.py # Chart for user activity distribution
 │   │   ├── weekly_app_popularity.py # Chart for weekly app popularity
 │   │   └── data_table_view.py     # Data table view for detailed information
