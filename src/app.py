@@ -15,12 +15,12 @@ df['EndOfWeek'] = pd.to_datetime(df['EndOfWeek'], format='%Y-%m-%d', errors='coe
 
 # Pass df to components
 from components.filters import get_filters_layout
-from components.summary_cards import get_summary_cards_layout
-from components.weekly_login_trends import weekly_login_trends_layout, get_weekly_login_trends_figure
-from components.app_usage_by_office import app_usage_by_office_layout, get_app_usage_by_office_figure
-from components.user_activity_distribution import user_activity_distribution_layout, get_user_activity_distribution_figure
-from components.weekly_app_popularity import weekly_app_popularity_layout, get_weekly_app_popularity_figure
-from components.data_table_view import data_table_view_layout, get_data_table_data
+# from components.summary_cards import get_summary_cards_layout
+# from components.weekly_login_trends import weekly_login_trends_layout, get_weekly_login_trends_figure
+# from components.app_usage_by_office import app_usage_by_office_layout, get_app_usage_by_office_figure
+# from components.user_activity_distribution import user_activity_distribution_layout, get_user_activity_distribution_figure
+# from components.weekly_app_popularity import weekly_app_popularity_layout, get_weekly_app_popularity_figure
+# from components.data_table_view import data_table_view_layout, get_data_table_data
 
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
 server = app.server
@@ -48,19 +48,21 @@ app.layout = dbc.Container([
     get_filters_layout(df),
     html.Br(),
     # get_summary_cards_layout(df),
-    html.Div(id="summary-cards-container"),
+    # html.Div(id="summary-cards-container"),
     html.Br(),
+
     dbc.Row([
-        dbc.Col(weekly_login_trends_layout(), width=6),
-        dbc.Col(app_usage_by_office_layout(), width=6)
+        # dbc.Col(weekly_login_trends_layout(), width=6),
+        # dbc.Col(app_usage_by_office_layout(), width=6)
     ]),
     html.Br(),
     dbc.Row([
-        dbc.Col(user_activity_distribution_layout(), width=6),
-        dbc.Col((weekly_app_popularity_layout()), width=6)
+        # dbc.Col(user_activity_distribution_layout(), width=6),
+        # dbc.Col((weekly_app_popularity_layout()), width=6)
     ]),
     html.Br(),
-    data_table_view_layout()
+    # data_table_view_layout()
+ 
 ], fluid=True)
 
 # --- Select All/Deselect All Callbacks for Filters ---
@@ -181,6 +183,8 @@ def filter_data(selected_weeks, selected_apps, selected_offices, selected_users,
 
     return filtered.to_dict("records")
 
+
+'''
 @app.callback(
     Output("summary-cards-container", "children"),
     Input("filtered-data-store", "data"),
@@ -192,7 +196,10 @@ def update_summary_cards(filtered_data):
         return get_summary_cards_layout(pd.DataFrame())
     filtered_df = pd.DataFrame(filtered_data)
     return get_summary_cards_layout(filtered_df)
+'''
 
+
+'''
 @app.callback(
     Output("weekly-login-trends-graph", "figure"),
     Input("filtered-data-store", "data"),
@@ -203,7 +210,10 @@ def update_weekly_login_trends(filtered_data, breakdown_dim, top_n):
     import pandas as pd
     filtered_df = pd.DataFrame(filtered_data) if filtered_data else pd.DataFrame()
     return get_weekly_login_trends_figure(filtered_df, breakdown_dim, top_n)
+'''
 
+
+'''
 @app.callback(
     Output("office-filter-dropdown", "options"),
     Output("app-filter-dropdown", "options"),
@@ -236,7 +246,10 @@ def update_app_usage_by_office_graph(filtered_data, selected_offices, selected_a
     if not showtop:
         showtop = 10
     return get_app_usage_by_office_figure(filtered_df, selected_offices, selected_apps, sortby, int(showtop))
+'''
 
+
+'''
 @app.callback(
     Output("activity-app-dropdown", "options"),
     Output("max-login-count-dropdown", "options"),
@@ -263,7 +276,10 @@ def update_user_activity_distribution_filters(filtered_data):
 def update_user_activity_distribution_graph(filtered_data, selected_apps, max_count, num_bins):
     filtered_df = pd.DataFrame(filtered_data) if filtered_data else pd.DataFrame()
     return get_user_activity_distribution_figure(filtered_df, max_count, selected_apps, num_bins)
+'''
 
+
+'''
 @app.callback(
     Output("popularity-apps-checklist", "options"),
     Output("popularity-apps-checklist", "value"),
@@ -293,7 +309,10 @@ def update_popularity_apps_checklist(filtered_data):
 def update_weekly_app_popularity_graph(filtered_data, selected_apps, display_type):
     filtered_df = pd.DataFrame(filtered_data) if filtered_data else pd.DataFrame()
     return get_weekly_app_popularity_figure(filtered_df, selected_apps, display_type)
+'''
 
+
+'''
 @app.callback(
     Output("data-table", "data"),
     Input("filtered-data-store", "data"),
@@ -301,6 +320,7 @@ def update_weekly_app_popularity_graph(filtered_data, selected_apps, display_typ
 def update_data_table(filtered_data):
     filtered_df = pd.DataFrame(filtered_data) if filtered_data else pd.DataFrame()
     return get_data_table_data(filtered_df)
+'''
 
 # --- Callback to clear all filters ---
 @app.callback(
