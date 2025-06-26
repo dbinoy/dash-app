@@ -15,7 +15,7 @@ df['EndOfWeek'] = pd.to_datetime(df['EndOfWeek'], format='%Y-%m-%d', errors='coe
 
 # Pass df to components
 from components.filters import get_filters_layout
-# from components.summary_cards import get_summary_cards_layout
+from components.summary_cards import get_summary_cards_layout
 # from components.weekly_login_trends import weekly_login_trends_layout, get_weekly_login_trends_figure
 # from components.app_usage_by_office import app_usage_by_office_layout, get_app_usage_by_office_figure
 # from components.user_activity_distribution import user_activity_distribution_layout, get_user_activity_distribution_figure
@@ -48,7 +48,7 @@ app.layout = dbc.Container([
     get_filters_layout(df),
     html.Br(),
     # get_summary_cards_layout(df),
-    # html.Div(id="summary-cards-container"),
+    html.Div(id="summary-cards-container"),
     html.Br(),
 
     dbc.Row([
@@ -183,8 +183,6 @@ def filter_data(selected_weeks, selected_apps, selected_offices, selected_users,
 
     return filtered.to_dict("records")
 
-
-'''
 @app.callback(
     Output("summary-cards-container", "children"),
     Input("filtered-data-store", "data"),
@@ -196,7 +194,6 @@ def update_summary_cards(filtered_data):
         return get_summary_cards_layout(pd.DataFrame())
     filtered_df = pd.DataFrame(filtered_data)
     return get_summary_cards_layout(filtered_df)
-'''
 
 
 '''
