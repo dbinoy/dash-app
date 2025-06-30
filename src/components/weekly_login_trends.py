@@ -26,16 +26,16 @@ def weekly_login_trends_layout():
             dbc.Row([
                 dbc.Col([
                     html.Label("Top N"),
-                    dcc.Slider(
+                    dcc.RangeSlider(
                         id="trend-top-n-slider",
-                        min=3,
+                        min=1,
                         max=20,
                         step=1,
-                        value=3,
-                        marks={i: str(i) for i in [3, 5, 7, 10, 15, 20]},
+                        value=[1, 3],
+                        marks={i: str(i) for i in range(1, 21)},
                         tooltip={"placement": "bottom", "always_visible": False},
                         updatemode="mouseup",
-                        included=False,
+                        allowCross=False,
                     )
                 ])
             ]),
@@ -43,8 +43,8 @@ def weekly_login_trends_layout():
         ])
     ])
 
-def get_weekly_login_trends_figure(filtered_df, breakdown_dim="None", top_n=3):
-    if filtered_df is None or filtered_df.empty :
+def get_weekly_login_trends_figure(df, breakdown_dim="None", top_n_range=None):
+    if df is None or df.empty :
         fig = px.line(title="Weekly Login Trends")
         fig.update_layout(
             xaxis_title="Week Starting",
@@ -53,15 +53,12 @@ def get_weekly_login_trends_figure(filtered_df, breakdown_dim="None", top_n=3):
         )
         return fig
 
-    # Group by Week and sum LoginCount
-    df = filtered_df.copy()
-    if "Week" in df.columns and "LoginCount" in df.columns and "StartOfWeek" in df.columns:
+    if "LoginCount" in df.columns and "StartOfWeek" in df.columns:
         df["StartOfWeek"] = pd.to_datetime(df["StartOfWeek"], errors="coerce")
 
         if breakdown_dim == "None":
-            weekly = df.groupby("StartOfWeek")["LoginCount"].sum().reset_index()
             fig = px.line(
-                weekly,
+                df,
                 x="StartOfWeek",
                 y="LoginCount",
                 title="Weekly Login Trends"
@@ -73,20 +70,19 @@ def get_weekly_login_trends_figure(filtered_df, breakdown_dim="None", top_n=3):
             )
             return fig
         else:
-            # Aggregate by Week and breakdown_dim
-            grouped = df.groupby(["StartOfWeek", breakdown_dim])["LoginCount"].sum().reset_index()
-
-            # Get top N entities by total LoginCount
-            top_entities = (
-                grouped.groupby(breakdown_dim)["LoginCount"].sum()
-                .sort_values(ascending=False)
-                .head(top_n)
-                .index
+            # Use the range from the slider to select top entities
+            if not top_n_range or len(top_n_range) != 2:
+                top_n_range = [1, 3]
+            n_min, n_max = top_n_range
+            all_entities = (
+                df.groupby(breakdown_dim)["LoginCount"].sum().sort_values(ascending=False)
             )
-            filtered_grouped = grouped[grouped[breakdown_dim].isin(top_entities)]
+            top_entities = all_entities.iloc[n_min-1:n_max].index
+            # print(f"Top entities for {breakdown_dim} in range {n_min}-{n_max}: {top_entities}")
+            filtered = df[df[breakdown_dim].isin(top_entities)]
 
             fig = px.line(
-                filtered_grouped,
+                filtered,
                 x="StartOfWeek",
                 y="LoginCount",
                 color=breakdown_dim,

@@ -1,4 +1,5 @@
 blinker==1.9.0
+cachelib==0.13.0
 certifi==2025.6.15
 charset-normalizer==3.4.2
 click==8.2.1
@@ -6,6 +7,7 @@ dash==3.1.0
 dash-bootstrap-components==2.0.3
 dash-table==5.0.0
 Flask==3.1.1
+Flask-Caching==2.3.1
 gunicorn==23.0.0
 idna==3.10
 importlib_metadata==8.7.0

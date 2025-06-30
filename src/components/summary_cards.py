@@ -1,23 +1,13 @@
 from dash import html
 import dash_bootstrap_components as dbc
 
-def get_summary_cards_layout(filtered_df):
+def get_summary_cards_layout(filtered_data):
     # Aggregations
-    total_logins = int(filtered_df['LoginCount'].sum()) if 'LoginCount' in filtered_df.columns else 0
-    unique_users = filtered_df['UserId'].nunique() if 'UserId' in filtered_df.columns else 0
-    avg_logins_per_user = int(round(total_logins / unique_users, 0)) if unique_users > 0 else 0
-
-    # Most used app
-    most_used_app = (
-        filtered_df.groupby('App')['LoginCount'].sum().sort_values(ascending=False).index[0]
-        if 'App' in filtered_df.columns and not filtered_df.empty else "N/A"
-    )
-
-    # Top office
-    top_office = (
-        filtered_df.groupby('OfficeName')['LoginCount'].sum().sort_values(ascending=False).index[0]
-        if 'OfficeName' in filtered_df.columns and not filtered_df.empty else "N/A"
-    )
+    total_logins = filtered_data['TotalLogins']
+    unique_users = filtered_data['UniqueUsers']
+    avg_logins_per_user = filtered_data['AvgLoginsPerUser']
+    most_used_app = filtered_data['MostUsedApp']
+    top_office = filtered_data['TopOffice']
 
     return dbc.Row([
         dbc.Col(dbc.Card([

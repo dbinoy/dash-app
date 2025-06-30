@@ -30,8 +30,8 @@ def weekly_app_popularity_layout():
         ])
     ])
 
-def get_weekly_app_popularity_figure(filtered_df, selected_apps, display_type="count"):
-    if filtered_df is None or filtered_df.empty or not selected_apps:
+def get_weekly_app_popularity_figure(df, selected_apps, display_type="count"):
+    if df is None or df.empty or not selected_apps:
         fig = px.area(title="Weekly App Popularity")
         fig.update_layout(
             xaxis_title="Week Starting",
@@ -40,24 +40,20 @@ def get_weekly_app_popularity_figure(filtered_df, selected_apps, display_type="c
         )
         return fig
 
-    df = filtered_df.copy()
     df["StartOfWeek"] = pd.to_datetime(df["StartOfWeek"], errors="coerce")
     # Filter for selected apps
-    df = df[df["App"].isin(selected_apps)]
-
-    # Group by StartOfWeek and App, sum LoginCount
-    grouped = df.groupby(["StartOfWeek", "App"])["LoginCount"].sum().reset_index()
+    df_selected = df[df["App"].isin(selected_apps)]
 
     if display_type == "percentage":
         # Calculate percentage for each week
-        total_per_week = grouped.groupby("StartOfWeek")["LoginCount"].transform("sum")
-        grouped["LoginCount"] = (grouped["LoginCount"] / total_per_week) * 100
+        total_per_week = df.groupby("StartOfWeek")["LoginCount"].transform("sum")
+        df_selected["LoginCount"] = (df_selected["LoginCount"] / total_per_week) * 100
         yaxis_title = "Login Count (%)"
     else:
         yaxis_title = "Login Count"
 
     fig = px.area(
-        grouped,
+        df_selected,
         x="StartOfWeek",
         y="LoginCount",
         color="App",

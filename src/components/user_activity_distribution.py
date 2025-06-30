@@ -28,11 +28,8 @@ def user_activity_distribution_layout():
         ])
     ])
 
-def get_user_activity_distribution_figure(filtered_df, max_count, selected_apps=None, num_bins=10):
-    df = filtered_df.copy()
-    # Filter by selected apps if provided
-    if selected_apps and "All" not in selected_apps:
-        df = df[df["App"].isin(selected_apps)]
+def get_user_activity_distribution_figure(df, max_count, selected_apps=None, num_bins=10):
+
     # Aggregate: total logins per user
     if "UserId" not in df.columns or "LoginCount" not in df.columns:
         fig = px.histogram(title="User Activity Distribution")
@@ -43,15 +40,11 @@ def get_user_activity_distribution_figure(filtered_df, max_count, selected_apps=
         )
         return fig
 
-    user_login_counts = df.groupby("UserId")["LoginCount"].sum().reset_index()
-    # Set bin range from 1 to max login count for a user
-    # min_count = 1
-    # max_count = int(user_login_counts["LoginCount"].max()) if not user_login_counts.empty else 1
     if max_count is not None:
-        user_login_counts = user_login_counts[user_login_counts["LoginCount"] <= max_count]
+        df = df[df["LoginCount"] <= max_count]
         
     fig = px.histogram(
-        user_login_counts,
+        df,
         x="LoginCount",
         nbins=num_bins,
         title="User Activity Distribution",

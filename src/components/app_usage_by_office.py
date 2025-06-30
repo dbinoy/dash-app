@@ -60,28 +60,19 @@ def app_usage_by_office_layout():
         ])
     ])
 
-def get_app_usage_by_office_figure(filtered_df, selected_offices, selected_apps, sortby, showtop):
-    df = filtered_df.copy()
-    # Filter by selected offices
-    if selected_offices and "All" not in selected_offices:
-        df = df[df["OfficeName"].isin(selected_offices)]
-    # Filter by selected apps
-    if selected_apps and "All" not in selected_apps:
-        df = df[df["App"].isin(selected_apps)]
-    # Group by Office and sum LoginCount
-    grouped = df.groupby("OfficeName")["LoginCount"].sum().reset_index()
-    # Sort
+def get_app_usage_by_office_figure(df, selected_offices, selected_apps, sortby, showtop):
+
     ascending = sortby == "asc"
-    grouped = grouped.sort_values("LoginCount", ascending=ascending)
+    df = df.sort_values("TotalLogins", ascending=ascending)
     # Show top N
-    grouped = grouped.tail(showtop) if ascending else grouped.head(showtop)
+    df = df.tail(showtop) if ascending else df.head(showtop)
     # Plot
     fig = px.bar(
-        grouped,
+        df,
         x="OfficeName",
-        y="LoginCount",
+        y="TotalLogins",
         title="Login Count by Office",
-        labels={"LoginCount": "Login Count", "OfficeName": "Office Name"},
+        labels={"TotalLogins": "Login Count", "OfficeName": "Office Name"},
     )
     fig.update_layout(
         xaxis_title="Office Name",

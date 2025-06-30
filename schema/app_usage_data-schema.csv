@@ -1,0 +1,11 @@
+COLUMN_NAME,DATA_TYPE
+UserId,varchar
+App,varchar
+Timestamp,datetime2
+Year,smallint
+Quarter,tinyint
+Month,tinyint
+Week,tinyint
+Day,tinyint
+Hour,tinyint
+Minute,tinyint
