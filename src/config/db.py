@@ -1,0 +1,15 @@
+driver = 'ODBC Driver 18 for SQL Server'
+workspace = 'lakehouse-dev-ws-ondemand'
+username = 'synapseadmin'
+password = 'Rec0reR0ck$'
+database = 'recore_ldw'
+conn_string = (
+    f'DRIVER={{{driver}}};'
+    f'SERVER=tcp:{workspace}.sql.azuresynapse.net,1433;'
+    f'DATABASE={database};'
+    f'UID={username};'
+    f'PWD={password};'
+    'Encrypt=yes;'
+    'TrustServerCertificate=no;'
+    'Connection Timeout=30;'
+)

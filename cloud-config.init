@@ -29,5 +29,4 @@ runcmd:
   - cd dash-app
   - python3 -m venv dashenv
   - /bin/bash -c "source dashenv/bin/activate && pip3 install -r requirements.txt" 
-  - cd src 
-  - /bin/bash -c "gunicorn --bind 0.0.0.0:8050 app:server --daemon"
+  - /bin/bash -c "gunicorn --bind 0.0.0.0:8050 src.app:server --daemon"
