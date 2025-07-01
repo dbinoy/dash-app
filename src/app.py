@@ -104,8 +104,10 @@ app.layout = dbc.Container([
 ], fluid=True)
 
 cache = Cache(app.server, config={
-    'CACHE_TYPE': 'filesystem',  # or 'simple' for in-memory, 'redis' for production
-    'CACHE_DIR': 'cache',  # required for filesystem cache
+    # 'CACHE_TYPE': 'filesystem',  # or 'simple' for in-memory, 'redis' for production
+    # 'CACHE_DIR': 'cache',  # required for filesystem cache
+    'CACHE_TYPE': 'redis',
+    'CACHE_REDIS_URL': 'redis://localhost:6379/0',  # or your Redis server address    
     'CACHE_DEFAULT_TIMEOUT': 86400     # cache timeout in seconds
 })
 

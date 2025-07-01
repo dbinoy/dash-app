@@ -21,10 +21,13 @@ runcmd:
   - echo 'export PATH="$PATH:/opt/mssql-tools18/bin"' >> ~/.bashrc
   - source ~/.bashrc
   - apt-get install -y unixodbc-dev
+  - apt-get install redis-server -y
+  - systemctl enable redis-server
+  - systemctl start redis-server
   - cd /home/azureuser
   - git clone https://github.com/dbinoy/dash-app.git
   - cd dash-app
   - python3 -m venv dashenv
   - /bin/bash -c "source dashenv/bin/activate && pip3 install -r requirements.txt" 
   - cd src 
-  - /bin/bash -c "source dashenv/bin/activate && gunicorn --bind 0.0.0.0:8050 app:server --daemon"
+  - /bin/bash -c "gunicorn --bind 0.0.0.0:8050 app:server --daemon"
