@@ -1,7 +1,8 @@
 .DS_Store
 cache/
 *.rdb
-
+*.png
+*.csv
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
