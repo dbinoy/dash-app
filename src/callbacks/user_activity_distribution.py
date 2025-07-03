@@ -20,7 +20,7 @@ def register_callbacks(app):
         if filtered_apps and "All" not in filtered_apps:
             app_options = [{"label": str(v), "value": v} for v in filtered_apps]
         else:
-            app_options = [{"label": str(v), "value": v} for v in df_unique_apps["App"]]
+            app_options = [{"label": str(v), "value": v} for v in df_unique_apps["App"] if pd.notnull(v)]
 
         q_user_login_counts = "SELECT [UserId], SUM([LoginCount]) AS LoginCount " + filtered_query
         if filtered_apps and "All" not in filtered_apps:

@@ -9,37 +9,12 @@ def register_callbacks(app):
         prevent_initial_call=False
     )
     def load_filter_data(_):
-        q_unique_members ='''
-        SELECT DISTINCT [UserId], [MemberName]
-        FROM [consumable].[vw_user_logins_by_day_user_app_office]
-        WHERE [MemberName] IS NOT NULL
-        ORDER BY [MemberName]
-        '''
-        q_unique_offices = '''
-        SELECT DISTINCT [OfficeName]
-        FROM [consumable].[vw_user_logins_by_day_user_app_office]
-        WHERE [OfficeName] IS NOT NULL
-        ORDER BY [OfficeName]
-        '''
-        q_unique_apps = '''
-        SELECT DISTINCT [App]
-        FROM [consumable].[vw_user_logins_by_day_user_app_office]
-        WHERE [App] IS NOT NULL
-        ORDER BY [App]
-        '''
-
-        q_unique_login_counts = '''
-        SELECT DISTINCT [LoginCount]
-        FROM [consumable].[vw_user_logins_by_day_user_app_office]
-        WHERE [LoginCount] IS NOT NULL
-        ORDER BY [LoginCount]
-        '''
-
-        q_earliest_and_latest_dates = '''
-        SELECT MIN(CONVERT(DATE, CONCAT(Year, '-', Month, '-', Day))) AS EarliestDay,
-            MAX(CONVERT(DATE, CONCAT(Year, '-', Month, '-', Day))) AS LatestDay
-        FROM [consumable].[vw_user_logins_by_day_user_app_office]
-        '''
+        q_unique_members ='SELECT [UserId], [MemberName]  FROM [consumable].[unique_members] order by [TotalLogins] desc'
+        q_unique_offices = 'SELECT [OfficeName]  FROM [consumable].[unique_offices] order by [TotalLogins] desc'
+        q_unique_apps = 'SELECT [App]  FROM [consumable].[unique_apps] order by [TotalLogins] desc'
+        q_unique_login_counts = 'SELECT [LoginCount]  FROM [consumable].[unique_login_counts] order by [LoginCount]'
+        q_earliest_and_latest_dates = 'SELECT [EarliestDay], [LatestDay]  FROM [consumable].[earliest_and_latest_dates]'
+        
         queries = {
             "unique_members": q_unique_members,
             "unique_offices": q_unique_offices,
