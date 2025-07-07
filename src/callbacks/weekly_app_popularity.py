@@ -31,9 +31,9 @@ def register_callbacks(app):
         Input("popularity-display-type", "value"),
     )
     def update_weekly_app_popularity_graph(filtered_query, selected_apps, display_type):
-        q_weekly_app_popularity = "SELECT MIN(CAST(CONCAT([Year], '-', RIGHT('0' + CAST([Month] AS VARCHAR(2)), 2), '-', RIGHT('0' + CAST([Day] AS VARCHAR(2)), 2)) AS DATE)) AS StartOfWeek, "
+        q_weekly_app_popularity = "SELECT MIN([Date]) AS StartOfWeek, "
         q_weekly_app_popularity += f"[App], SUM([LoginCount]) AS LoginCount {filtered_query} AND [App] IS NOT NULL "  
-        q_weekly_app_popularity += f"GROUP BY [Year], DATEPART(week, CAST(CONCAT([Year], '-', RIGHT('0' + CAST([Month] AS VARCHAR(2)), 2), '-', RIGHT('0' + CAST([Day] AS VARCHAR(2)), 2)) AS DATE)), [App] "
+        q_weekly_app_popularity += f"GROUP BY DATEPART(week, [Date]), [App] "
         q_weekly_app_popularity += "ORDER BY StartOfWeek, App" 
 
         # print("Generated Weekly App Popularity Query:", q_weekly_app_popularity)  # Debugging line to check the generated query

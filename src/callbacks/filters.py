@@ -6,15 +6,20 @@ def register_callbacks(app):
     @app.callback(
         Output("filter-data-store", "data"),
         Input("filtered-query-store", "id"),  # This will trigger on page load; you can use any component that always exists
+        # Input("filtered-query-store", "data"),  
         prevent_initial_call=False
     )
     def load_filter_data(_):
+    # def load_filter_data(filtered_query):
         q_unique_members ='SELECT [UserId], [MemberName]  FROM [consumable].[unique_members] order by [TotalLogins] desc'
         q_unique_offices = 'SELECT [OfficeName]  FROM [consumable].[unique_offices] order by [TotalLogins] desc'
-        q_unique_apps = 'SELECT [App]  FROM [consumable].[unique_apps] order by [TotalLogins] desc'
+        q_unique_apps = 'SELECT [App]  FROM [consumable].[unique_apps] order by [TotalLogins] desc'    
+        # q_unique_members =f'SELECT [UserId], [MemberName]  FROM [consumable].[unique_members] WHERE [MemberName] IN (SELECT DISTINCT [MemberName] {filtered_query}) order by [TotalLogins] desc'
+        # q_unique_offices = f'SELECT [OfficeName]  FROM [consumable].[unique_offices] WHERE [OfficeName] IN (SELECT DISTINCT [OfficeName] {filtered_query}) order by [TotalLogins] desc'
+        # q_unique_apps = f'SELECT [App]  FROM [consumable].[unique_apps] WHERE [App] IN (SELECT DISTINCT [App] {filtered_query}) order by [TotalLogins] desc'
         q_unique_login_counts = 'SELECT [LoginCount]  FROM [consumable].[unique_login_counts] order by [LoginCount]'
         q_earliest_and_latest_dates = 'SELECT [EarliestDay], [LatestDay]  FROM [consumable].[earliest_and_latest_dates]'
-        
+
         queries = {
             "unique_members": q_unique_members,
             "unique_offices": q_unique_offices,
@@ -122,13 +127,13 @@ def register_callbacks(app):
         Input("date-range-picker", "end_date"),    
     )
     def filter_data_query(selected_apps, selected_offices, selected_users, selected_members, login_count_range, start_date, end_date):
-        query = "FROM [consumable].[vw_user_logins_by_day_user_app_office] "
+        query = "FROM [consumable].[daily_logins] "
         if start_date is not None and end_date is not None:
-            query += f"WHERE CAST(CONCAT([Year], '-', RIGHT('0' + CAST([Month] AS VARCHAR(2)), 2), '-', RIGHT('0' + CAST([Day] AS VARCHAR(2)), 2)) AS DATE) BETWEEN CAST('{start_date}' AS DATE) AND CAST('{end_date}' AS DATE) "
+            query += f"WHERE [Date] BETWEEN CAST('{start_date}' AS DATE) AND CAST('{end_date}' AS DATE) "
         elif end_date is not None:
-            query += f"WHERE CAST(CONCAT([Year], '-', RIGHT('0' + CAST([Month] AS VARCHAR(2)), 2), '-', RIGHT('0' + CAST([Day] AS VARCHAR(2)), 2)) AS DATE) <= CAST('{end_date}' AS DATE) "
+            query += f"WHERE [Date] <= CAST('{end_date}' AS DATE) "
         elif start_date is not None:
-            query += f"WHERE CAST(CONCAT([Year], '-', RIGHT('0' + CAST([Month] AS VARCHAR(2)), 2), '-', RIGHT('0' + CAST([Day] AS VARCHAR(2)), 2)) AS DATE) >= CAST('{start_date}' AS DATE) "
+            query += f"WHERE [Date] >= CAST('{start_date}' AS DATE) "
         else:
             query += "WHERE 1=1 "    
 

@@ -12,13 +12,13 @@ def get_summary_cards_layout(filtered_data):
     return dbc.Row([
         dbc.Col(dbc.Card([
             dbc.CardBody([
-                html.H4(f"{total_logins:,}", className="card-title"),
+                html.H4(f"{total_logins}", className="card-title"),
                 html.P("Total Logins", className="card-text")
             ])
         ]), width=2),
         dbc.Col(dbc.Card([
             dbc.CardBody([
-                html.H4(f"{unique_users:,}", className="card-title"),
+                html.H4(f"{unique_users}", className="card-title"),
                 html.P("Unique Users", className="card-text")
             ])
         ]), width=2),

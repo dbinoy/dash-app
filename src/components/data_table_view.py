@@ -10,7 +10,6 @@ def data_table_view_layout():
             dash_table.DataTable(
                 id="data-table",
                 columns=[
-                    {"name": "Year", "id": "year"},
                     {"name": "StartOfWeek", "id": "startofweek"},
                     {"name": "App", "id": "app"},
                     {"name": "OfficeName", "id": "officename"},
@@ -35,7 +34,7 @@ def get_data_table_data(df, max_rows=1000):
     # selected_cols = [col_map.get(c.lower(), c) for c in columns if c.lower() in col_map]
     # df = filtered_df[selected_cols].copy() if selected_cols else pd.DataFrame(columns=columns)
     # Convert Year and Week to string for DataTable filtering to work
-    for col in ["Year", "LoginCount"]:
+    for col in ["LoginCount"]:
         if col in df.columns:
             df[col] = df[col].astype(str)    
     # Limit to max_rows

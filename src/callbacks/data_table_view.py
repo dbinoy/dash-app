@@ -11,8 +11,7 @@ def register_callbacks(app):
     def update_data_table(filtered_query):
         q_data_table = f'''
         SELECT
-            [Year],
-            MIN(CAST(CONCAT([Year], '-', RIGHT('0' + CAST([Month] AS VARCHAR(2)), 2), '-', RIGHT('0' + CAST([Day] AS VARCHAR(2)), 2)) AS DATE)) AS StartOfWeek,
+            MIN([Date]) AS StartOfWeek,
             [App],
             [OfficeName],
             [UserId],
@@ -22,13 +21,12 @@ def register_callbacks(app):
         AND [OfficeName] IS NOT NULL
         AND [UserId] IS NOT NULL
         GROUP BY
-            [Year],
-            DATEPART(week, CAST(CONCAT([Year], '-', RIGHT('0' + CAST([Month] AS VARCHAR(2)), 2), '-', RIGHT('0' + CAST([Day] AS VARCHAR(2)), 2)) AS DATE)),
+            DATEPART(week, [Date]),
             [App],
             [OfficeName],
             [UserId]    
         ORDER BY
-            [Year], StartOfWeek, LoginCount DESC, [App], [OfficeName], [UserId]
+            StartOfWeek, LoginCount DESC, [App], [OfficeName], [UserId]
         '''
         # print("Generated Data Table Query:", q_data_table)  # Debugging line to check the generated query
         queries = {

@@ -14,13 +14,13 @@ def register_callbacks(app):
         Input("user-dropdown", "value"),     
     )
     def update_weekly_login_trends(filtered_query, breakdown_dim, top_n, selected_apps, selected_offices, selected_users):
-        q_weekly_trend = "SELECT MIN(CAST(CONCAT([Year], '-', RIGHT('0' + CAST([Month] AS VARCHAR(2)), 2), '-', RIGHT('0' + CAST([Day] AS VARCHAR(2)), 2)) AS DATE)) AS StartOfWeek, "
+        q_weekly_trend = "SELECT MIN([Date]) AS StartOfWeek, "
         if breakdown_dim != "None":
             q_weekly_trend += f"[{breakdown_dim}], "
         q_weekly_trend += f"SUM([LoginCount]) AS LoginCount {filtered_query}"  
         if breakdown_dim != "None":
             q_weekly_trend += f" AND [{breakdown_dim}] IS NOT NULL AND [{breakdown_dim}] IN "
-            q_weekly_trend += f"(SELECT TOP {20} [{breakdown_dim}] FROM [consumable].[vw_user_logins_by_day_user_app_office] WHERE [{breakdown_dim}] IS NOT NULL "
+            q_weekly_trend += f"(SELECT TOP {20} [{breakdown_dim}] {filtered_query} AND [{breakdown_dim}] IS NOT NULL "
             if breakdown_dim == "App":
                 if selected_apps and "All" not in selected_apps:
                     q_weekly_trend += f"AND [App] IN ({', '.join(['\''+app+'\'' for app in selected_apps])}) "
@@ -30,11 +30,11 @@ def register_callbacks(app):
             elif breakdown_dim == "UserId":
                 if selected_users and "All" not in selected_users:
                     q_weekly_trend += f"AND [UserId] IN ({', '.join(['\''+user+'\'' for user in selected_users])}) "
-            q_weekly_trend += f"GROUP BY [{breakdown_dim}] ORDER BY SUM([LoginCount]) DESC) "
-        q_weekly_trend += f"GROUP BY [Year], DATEPART(week, CAST(CONCAT([Year], '-', RIGHT('0' + CAST([Month] AS VARCHAR(2)), 2), '-', RIGHT('0' + CAST([Day] AS VARCHAR(2)), 2)) AS DATE)) "
+            q_weekly_trend += f" GROUP BY [{breakdown_dim}] ORDER BY SUM([LoginCount]) DESC) "
+        q_weekly_trend += f" GROUP BY DATEPART(week, [Date]) "
         if breakdown_dim != "None":
             q_weekly_trend += f", [{breakdown_dim}] "
-        q_weekly_trend += "ORDER BY [Year], StartOfWeek, LoginCount DESC"
+        q_weekly_trend += "ORDER BY StartOfWeek, LoginCount DESC"
 
         # print("Generated Trend Query:", q_weekly_trend)  # Debugging line to check the generated query
 
