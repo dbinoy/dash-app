@@ -26,7 +26,7 @@ def welcome_layout():
                                 ),
                                 dbc.Col(
                                     dbc.Button(
-                                        "Azure Cost & Usage",
+                                        "Azure Cost Analysis",
                                         href="/azure-cost",
                                         color="secondary",
                                         size="lg"

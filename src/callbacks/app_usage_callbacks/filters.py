@@ -5,18 +5,13 @@ from src.utils.db import run_queries
 def register_callbacks(app):
     @app.callback(
         Output("filter-data-store", "data"),
-        Input("filtered-query-store", "id"),  # This will trigger on page load; you can use any component that always exists
-        # Input("filtered-query-store", "data"),  
+        Input("filtered-query-store", "id"), 
         prevent_initial_call=False
     )
     def load_filter_data(_):
-    # def load_filter_data(filtered_query):
         q_unique_members ='SELECT [UserId], [MemberName]  FROM [consumable].[unique_members] order by [TotalLogins] desc'
         q_unique_offices = 'SELECT [OfficeName]  FROM [consumable].[unique_offices] order by [TotalLogins] desc'
         q_unique_apps = 'SELECT [App]  FROM [consumable].[unique_apps] order by [TotalLogins] desc'    
-        # q_unique_members =f'SELECT [UserId], [MemberName]  FROM [consumable].[unique_members] WHERE [MemberName] IN (SELECT DISTINCT [MemberName] {filtered_query}) order by [TotalLogins] desc'
-        # q_unique_offices = f'SELECT [OfficeName]  FROM [consumable].[unique_offices] WHERE [OfficeName] IN (SELECT DISTINCT [OfficeName] {filtered_query}) order by [TotalLogins] desc'
-        # q_unique_apps = f'SELECT [App]  FROM [consumable].[unique_apps] WHERE [App] IN (SELECT DISTINCT [App] {filtered_query}) order by [TotalLogins] desc'
         q_unique_login_counts = 'SELECT [LoginCount]  FROM [consumable].[unique_login_counts] order by [LoginCount]'
         q_earliest_and_latest_dates = 'SELECT [EarliestDay], [LatestDay]  FROM [consumable].[earliest_and_latest_dates]'
 
@@ -28,7 +23,6 @@ def register_callbacks(app):
             "earliest_and_latest_dates": q_earliest_and_latest_dates,
         }    
         results = run_queries(queries, len(queries.keys()))
-        # Convert DataFrames to dict for storage in dcc.Store
         return {
             "unique_members": results["unique_members"].to_dict("records"),
             "unique_offices": results["unique_offices"].to_dict("records"),
@@ -51,7 +45,6 @@ def register_callbacks(app):
     )
     def populate_filters(filter_data):
         if not filter_data:
-            # Return empty/defaults
             return [], [], [], [], 0, 0, {}, "", ""
         df_unique_members = pd.DataFrame(filter_data["unique_members"])
         df_unique_offices = pd.DataFrame(filter_data["unique_offices"])
@@ -73,7 +66,6 @@ def register_callbacks(app):
 
         return app_options, office_options, user_options, member_options, min_login, max_login, marks, str(start_placeholder), str(end_placeholder)
 
-    # --- Callback to clear all filters ---
     @app.callback(
         Output("app-dropdown", "value", allow_duplicate=True),
         Output("office-dropdown", "value", allow_duplicate=True),

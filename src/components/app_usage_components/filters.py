@@ -2,8 +2,8 @@ from dash import html, dcc
 import dash_bootstrap_components as dbc
 import pandas as pd
 
-def make_options(values):
-    return [{"label": str(v), "value": v} for v in sorted(values) if pd.notnull(v)]
+# def make_options(values):
+#     return [{"label": str(v), "value": v} for v in sorted(values) if pd.notnull(v)]
 
 def get_filters_layout():
     filters_layout = dbc.Card(

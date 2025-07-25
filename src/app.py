@@ -17,7 +17,7 @@ cache.init_app(server)
 navbar = dbc.NavbarSimple(
     children=[
         dbc.NavItem(dbc.NavLink("App Usage Telemetry", href="/app-usage", className="nav-link")),
-        dbc.NavItem(dbc.NavLink("Azure Cost & Usage", href="/azure-cost", className="nav-link")),
+        dbc.NavItem(dbc.NavLink("Azure Cost Analysis", href="/azure-cost", className="nav-link")),
     ],
     brand="Analytics Dashboard",
     brand_href="/",

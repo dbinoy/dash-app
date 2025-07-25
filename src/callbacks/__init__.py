@@ -6,6 +6,8 @@ from src.callbacks.app_usage_callbacks.user_activity_distribution import registe
 from src.callbacks.app_usage_callbacks.weekly_app_popularity import register_callbacks as register_weekly_app_popularity_callbacks
 from src.callbacks.app_usage_callbacks.data_table_view import register_callbacks as register_data_table_view_callbacks
 
+from src.callbacks.azure_cost_callbacks.filters import register_azure_cost_callbacks
+
 def register_all_callbacks(app):
     register_filters_callbacks(app)
     register_summary_cards_callbacks(app)
@@ -14,3 +16,5 @@ def register_all_callbacks(app):
     register_user_activity_distribution_callbacks(app)
     register_weekly_app_popularity_callbacks(app)
     register_data_table_view_callbacks(app)
+
+    register_azure_cost_callbacks(app)
