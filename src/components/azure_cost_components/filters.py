@@ -52,8 +52,46 @@ def get_filters_layout():
                             disabled=False
                         )
                     ], className="d-grid gap-1")
-                ], width=5),                 
-            ], className="mb-2")
+                ], width=5)                
+            ], className="mb-2"),
+            dbc.Row([
+                dbc.Col([
+                    html.Div([
+                        html.Label("Provider"),
+                        dcc.Dropdown(
+                            id="provider-dropdown", 
+                            options=[],
+                            placeholder="Select Provider",
+                            multi=True,
+                            disabled=False
+                        )
+                    ], className="d-grid gap-1")
+                ], width=4), 
+                dbc.Col([
+                    html.Div([
+                        html.Label("Service"),
+                        dcc.Dropdown(
+                            id="service-dropdown", 
+                            options=[],
+                            placeholder="Select Service",
+                            multi=True,
+                            disabled=False
+                        )
+                    ], className="d-grid gap-1")
+                ], width=4), 
+                dbc.Col([
+                    html.Div([
+                        html.Label("ResourceType"),
+                        dcc.Dropdown(
+                            id="resourcetype-dropdown", 
+                            options=[],
+                            placeholder="Select ResourceType",
+                            multi=True,
+                            disabled=False
+                        )
+                    ], className="d-grid gap-1")
+                ], width=4),                                              
+            ], className="mb-2"),
         ]),
         className="mb-3"
     )    
