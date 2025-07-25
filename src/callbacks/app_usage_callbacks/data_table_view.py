@@ -1,7 +1,7 @@
 from dash.dependencies import Input, Output, State
 import pandas as pd
 from src.utils.db import run_queries
-from src.components.data_table_view import get_data_table_data
+from src.components.app_usage_components.data_table_view import get_data_table_data
 
 def register_callbacks(app):
     @app.callback(

@@ -1,14 +1,14 @@
 from dash import html, dcc
 import dash_bootstrap_components as dbc
-from src.components.filters import get_filters_layout
-from src.components.summary_cards import get_summary_cards_layout
-from src.components.weekly_login_trends import weekly_login_trends_layout
-from src.components.app_usage_by_office import app_usage_by_office_layout
-from src.components.user_activity_distribution import user_activity_distribution_layout
-from src.components.weekly_app_popularity import weekly_app_popularity_layout
-from src.components.data_table_view import data_table_view_layout
+from src.components.app_usage_components.filters import get_filters_layout
+from src.components.app_usage_components.summary_cards import get_summary_cards_layout
+from src.components.app_usage_components.weekly_login_trends import weekly_login_trends_layout
+from src.components.app_usage_components.app_usage_by_office import app_usage_by_office_layout
+from src.components.app_usage_components.user_activity_distribution import user_activity_distribution_layout
+from src.components.app_usage_components.weekly_app_popularity import weekly_app_popularity_layout
+from src.components.app_usage_components.data_table_view import data_table_view_layout
 
-def create_layout():
+def create_app_usage_layout():
     return dbc.Container([
     dcc.Store(id="filtered-query-store"),
     dcc.Store(id="filter-data-store"),

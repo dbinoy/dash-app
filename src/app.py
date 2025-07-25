@@ -2,8 +2,8 @@ import dash
 from dash import html, dcc
 import dash_bootstrap_components as dbc
 from src.utils.cache import cache
-from src.components.layout import create_layout
-from src.components.azure_cost_layout import azure_cost_layout
+from src.components.app_usage_components.app_usage_layout import create_app_usage_layout
+from src.components.azure_cost_components.azure_cost_layout import create_azure_cost_layout
 from src.components.welcome_layout import welcome_layout
 from src.callbacks import register_all_callbacks
 
@@ -30,7 +30,7 @@ navbar = dbc.NavbarSimple(
 app.layout = html.Div([
     dcc.Location(id='url', refresh=False),
     navbar,
-    html.Div(id='page-content', className='container')
+    html.Div(id='page-content')
 ])
 
 #Routing callback
@@ -40,9 +40,9 @@ app.layout = html.Div([
 )
 def display_page(pathname):
     if pathname == '/app-usage':
-        return create_layout()
+        return create_app_usage_layout()
     elif pathname == '/azure-cost':
-        return azure_cost_layout()
+        return create_azure_cost_layout()
     else:
         return welcome_layout()
 # app.layout = create_layout()

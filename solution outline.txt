@@ -1,0 +1,51 @@
+Background and Objective:
+
+We have Azure cost and usage data in data warehouse. 
+This data can be lloked from different dimensions, such as Subscription, ResourceGroup, ServiceName, Provider, ResourceType and so on.
+We have precomputed unique items along these dimensions as CETAS table in my warehouse. 
+We have also pprecomputed certain aggregations such as monthly weekly and daily spend by one or more of the above dimensions, 
+for example - daily cost by subscription, monthly cost by servicename and resourcegroup, monthly cost by service name and subscription, 
+monthly and weekly costs by service name and servicename resourcegroup combination and so on. 
+
+We need to create analytics dashboard to provide CFO with insights into cloud spending across these various dimensions and time windows.
+While CFO doesn't have any particular view in mind, she will be interested in knowing things like how Cloud cost across different dev, test, and prod environments 
+are trending over time, which areas they are spending most on, whether there are any anomalies or certain spike in certain spending and so on. 
+
+We need a detailed plan for a dashboard with various widgets that will show such different viewpoints. 
+The charts needs to be interactive, so that user can play around choosing various different filtering condition across dimensions and time windows, 
+and easily spot the trends.
+
+Plan:
+
+# Title - Azure Cloud Cost Analytics
+# Description - Comprehensive cloud spending analytics data app providing CFO insights into Azure costs across subscriptions, resource groups, services, 
+and time periods with interactive filtering to identify trends, anomalies, and optimization opportunities.
+
+# Charts
+1. Cloud spending trends over time as a line chart with dropdowns to select time aggregation (daily, weekly, monthly) 
+and group by dimension (subscription, service name, resource group)
+2. Cost breakdown by service name as a treemap with dropdowns to filter by subscription and date range picker for time period selection
+3. Subscription cost comparison as a horizontal bar chart with multi-dropdown to select subscriptions and slider to adjust time window for rolling averages
+4. Resource group spending patterns as a heatmap with dropdowns to select subscription and service name filters and date range picker for analysis period
+5. Cost anomaly detection over time as a scatter plot with range inputs to set anomaly thresholds and dropdown to select dimension for analysis 
+(service, resource group, subscription)
+6. Top cost drivers by resource type as a stacked bar chart with multi-dropdown to select resource locations and slider 
+to adjust number of top items displayed (5-20)
+
+# Global Filters
+1. Usage Date with date range picker (2024-03-07 to 2025-05-25)
+2. Subscription Name with multi-dropdown (crmls-demo, crmls-test)
+3. Service Name with multi-dropdown (all 20 unique service names in alphabetical order)
+4. Resource Group with multi-dropdown (all 37 unique resource groups in alphabetical order)
+5. Resource Location with multi-dropdown (us west, global, us west 2, us east 2, eu west, ap east)
+6. Provider with multi-dropdown (all 16 unique providers in alphabetical order)
+7. Cost Range with range input (0.0 to 22.26 USD)
+8. Resource Type with multi-dropdown (all 24 unique resource types in alphabetical order)
+
+# Theme
+Professional financial theme with blue and green color scheme emphasizing trust and cost optimization, 
+clean corporate typography, and subtle shadows with data visualization palette optimized for financial reporting
+
+# Other Details
+Dashboard designed for CFO-level insights with focus on cost trends, anomaly detection, and environment-based spending analysis 
+across dev, test, and prod environments.

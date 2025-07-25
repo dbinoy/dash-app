@@ -1,7 +1,7 @@
 from dash import html
 import dash_bootstrap_components as dbc
 
-def azure_cost_layout():
+def create_azure_cost_layout():
     return html.Div([
         dbc.Row([
             dbc.Col(html.H1("Azure Cost Analysis"), width=12)
