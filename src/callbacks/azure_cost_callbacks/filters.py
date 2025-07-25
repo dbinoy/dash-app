@@ -72,15 +72,21 @@ def register_azure_cost_callbacks(app):
     
     @app.callback(
         Output("resourcegroup-dropdown", "options"),
+        Input("tenant-dropdown", "value"),
         Input("subscription-dropdown", "value"),
         Input("azure-cost-filter-data-store", "data"),    
         prevent_initial_call=True
     )
-    def populate_resourcegroup_options(selected_subscriptions, filter_data):
+    def populate_resourcegroup_options(selected_tenants, selected_subscriptions, filter_data):
         if not filter_data:
             return []
         unique_resourcegroups = []
-        unique_subscriptions = pd.DataFrame(filter_data["unique_subscriptions"])['SubscriptionName'].tolist()
+        
+        df_unique_subscriptions = pd.DataFrame(filter_data["unique_subscriptions"])  
+        if selected_tenants and len(selected_tenants) != 0 and "All" not in selected_tenants:
+            df_unique_subscriptions = df_unique_subscriptions[df_unique_subscriptions["Tenant"].isin(selected_tenants)]
+
+        unique_subscriptions = df_unique_subscriptions['SubscriptionName'].tolist()
         print(selected_subscriptions)
         print(unique_subscriptions)
         for subscription in unique_subscriptions:
