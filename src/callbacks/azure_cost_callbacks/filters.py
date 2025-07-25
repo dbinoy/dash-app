@@ -64,7 +64,7 @@ def register_azure_cost_callbacks(app):
         Input("azure-cost-filter-data-store", "data"),    
         prevent_initial_call=True
     )
-    def populate_subscription_options(selected_tenants, filter_data):
+    def populate_subscription_filter(selected_tenants, filter_data):
         if not filter_data:
             return []
         df_unique_subscriptions = pd.DataFrame(filter_data["unique_subscriptions"])  
@@ -83,7 +83,7 @@ def register_azure_cost_callbacks(app):
         Input("azure-cost-filter-data-store", "data"),    
         prevent_initial_call=True
     )
-    def populate_resourcegroup_options(selected_tenants, selected_subscriptions, filter_data):
+    def populate_resourcegroup_filter(selected_tenants, selected_subscriptions, filter_data):
         if not filter_data:
             return []
         unique_resourcegroups = []
@@ -112,7 +112,33 @@ def register_azure_cost_callbacks(app):
 
         resourcegroup_options = resourcegroup_options+[{"label": v, "value": v} for v in filtered_resourcegroup if len(filtered_resourcegroup) > 0]
         return resourcegroup_options
-    # --- Callback to clear all filters ---
+
+    @app.callback(
+        Output("provider-dropdown", "options"),
+        Input("subscription-dropdown", "value"),
+        Input("resourcegroup-dropdown", "value"),
+        Input("azure-cost-filter-data-store", "data"),    
+        prevent_initial_call=True
+    )
+    def populate_provider_filter(selected_subscriptions, selected_resourcegroups, filter_data):
+        if not filter_data:
+            return []
+        
+        df_unique_service_providers = pd.DataFrame(filter_data["unique_service_providers"])   
+
+        if selected_subscriptions and len(selected_subscriptions) != 0 and "All" not in selected_subscriptions:
+            df_unique_service_providers = df_unique_service_providers[df_unique_service_providers['SubscriptionsUsed'].apply(
+                lambda x: any(subscription.strip() in selected_subscriptions for subscription in x.split(','))
+            )]    
+
+        if selected_resourcegroups and len(selected_resourcegroups) != 0 and "All" not in selected_resourcegroups:
+            df_unique_service_providers = df_unique_service_providers[df_unique_service_providers['ResourceGroupsUsed'].apply(
+                lambda x: any(resource.strip() in selected_resourcegroups for resource in x.split(','))
+            )]             
+
+        provider_options = [{"label": f"All Providers", "value": "All"}]+[{"label": str(v), "value": v} for v in df_unique_service_providers["Provider"].unique() if pd.notnull(v)]
+        return provider_options
+
     @app.callback(
         Output("azure-cost-date-range-picker", "start_date", allow_duplicate=True),
         Output("azure-cost-date-range-picker", "end_date", allow_duplicate=True),
