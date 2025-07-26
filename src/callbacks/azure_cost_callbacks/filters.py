@@ -170,6 +170,47 @@ def register_azure_cost_callbacks(app):
         return provider_options    
 
     @app.callback(
+        Output("resourcetype-dropdown", "options"),
+        Input("subscription-dropdown", "value"),
+        Input("resourcegroup-dropdown", "value"),
+        Input("provider-dropdown", "value"),
+        Input("service-dropdown", "value"),
+        Input("azure-cost-filter-data-store", "data"),    
+        prevent_initial_call=True
+    )
+    def populate_service_filter(selected_subscriptions, selected_resourcegroups, selected_providers, selected_services, filter_data):
+        if not filter_data:
+            return []
+        
+        df_unique_service_providers = pd.DataFrame(filter_data["unique_service_providers"])   
+
+        if selected_subscriptions and len(selected_subscriptions) != 0 and "All" not in selected_subscriptions:
+            df_unique_service_providers = df_unique_service_providers[df_unique_service_providers['SubscriptionsUsed'].apply(
+                lambda x: any(subscription.strip() in selected_subscriptions for subscription in x.split(','))
+            )]    
+
+        if selected_resourcegroups and len(selected_resourcegroups) != 0 and "All" not in selected_resourcegroups:
+            df_unique_service_providers = df_unique_service_providers[df_unique_service_providers['ResourceGroupsUsed'].apply(
+                lambda x: any(resource.strip() in selected_resourcegroups for resource in x.split(','))
+            )]             
+
+        if selected_providers and len(selected_providers) != 0 and "All" not in selected_providers:  
+            df_unique_service_providers = df_unique_service_providers[df_unique_service_providers["Provider"].isin(selected_providers)]   
+
+        if selected_services and len(selected_services) != 0 and "All" not in selected_services:
+            df_unique_service_providers = df_unique_service_providers[df_unique_service_providers["ServiceName"].isin(selected_services)]  
+
+        df_unique_resource_types = pd.DataFrame(filter_data["unique_resource_types"])
+        df_unique_resource_types = df_unique_resource_types[df_unique_resource_types["ServiceUsed"].apply(
+            lambda x: any(service.strip() in df_unique_service_providers['ServiceName'].tolist() for service in x.split(','))
+        )] 
+        df_unique_resource_types = df_unique_resource_types[df_unique_resource_types["ProviderUsed"].apply(
+            lambda x: any(provider.strip() in df_unique_service_providers['Provider'].tolist() for provider in x.split(','))
+        )]
+        resourcetype_options = [{"label": f"All ResourceTypes", "value": "All"}]+[{"label": str(v), "value": v} for v in df_unique_resource_types["ResourceType"].unique() if pd.notnull(v)]
+        return resourcetype_options    
+    
+    @app.callback(
         Output("azure-cost-date-range-picker", "start_date", allow_duplicate=True),
         Output("azure-cost-date-range-picker", "end_date", allow_duplicate=True),
         Output("tenant-dropdown", "value", allow_duplicate=True),
@@ -177,6 +218,7 @@ def register_azure_cost_callbacks(app):
         Output("resourcegroup-dropdown", "value", allow_duplicate=True),
         Output("provider-dropdown", "value", allow_duplicate=True),
         Output("service-dropdown", "value", allow_duplicate=True),
+        Output("resourcetype-dropdown", "value", allow_duplicate=True),
         Input("azure-cost-clear-filters-btn", "n_clicks"),
         Input("azure-cost-filter-data-store", "data"),    
         prevent_initial_call=True
@@ -187,6 +229,7 @@ def register_azure_cost_callbacks(app):
         resourcegroup_default = []
         provider_default = []
         service_default = []
+        resourcetype_default = []
         if not filter_data:
             date_start_default = ""
             date_end_default = ""
@@ -194,4 +237,5 @@ def register_azure_cost_callbacks(app):
             df_earliest_and_latest_dates = pd.DataFrame(filter_data["earliest_and_latest_dates"])        
             date_start_default = df_earliest_and_latest_dates["EarliestDay"][0]
             date_end_default = df_earliest_and_latest_dates["LatestDay"][0]
-        return date_start_default, date_end_default, tenant_default, subscription_default, resourcegroup_default, provider_default, service_default
+        return date_start_default, date_end_default, tenant_default, subscription_default, resourcegroup_default, provider_default, service_default, resourcetype_default
+    
