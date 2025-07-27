@@ -2,7 +2,7 @@ from dash.dependencies import Input, Output, State
 import pandas as pd
 from src.utils.db import run_queries
 
-def register_azure_cost_callbacks(app):
+def register_azure_cost_filter_callbacks(app):
     @app.callback(
         Output("azure-cost-filter-data-store", "data"),
         Input("azure-cost-filtered-query-store", "id"), 
@@ -239,3 +239,28 @@ def register_azure_cost_callbacks(app):
             date_end_default = df_earliest_and_latest_dates["LatestDay"][0]
         return date_start_default, date_end_default, tenant_default, subscription_default, resourcegroup_default, provider_default, service_default, resourcetype_default
     
+    @app.callback(
+        Output("azure-cost-filtered-query-store", "data"), 
+        Input("azure-cost-date-range-picker", "start_date"),
+        Input("azure-cost-date-range-picker", "end_date"),    
+        Input("tenant-dropdown", "value"),
+        Input("subscription-dropdown", "value"),
+        Input("resourcegroup-dropdown", "value"),
+        Input("provider-dropdown", "value"),    
+        Input("service-dropdown", "value"),
+        Input("resourcetype-dropdown", "value"),
+    )
+
+    def filter_data_query(start_date, end_date, selected_tenants, selected_subscriptions, selected_resourcegroups, selected_providers, selected_services, selected_resourcetypes):
+        selections = {
+            "UsageDay_From": start_date if start_date is not None else "",
+            "UsageDay_To": end_date if end_date is not None else "",
+            "Tenant": ", ".join(["'"+tenant+"'" for tenant in selected_tenants]) if selected_tenants and len(selected_tenants) > 0 and "All" not in selected_tenants else "",
+            "SubscriptionName": ", ".join(["'"+subscription+"'" for subscription in selected_subscriptions]) if selected_subscriptions and len(selected_subscriptions) > 0 and "All" not in selected_subscriptions else "",
+            "ResourceGroup": ", ".join(["'"+resourcegroup+"'" for resourcegroup in selected_resourcegroups]) if selected_resourcegroups and len(selected_resourcegroups) > 0 and "All" not in selected_resourcegroups else "",
+            "Provider": ", ".join(["'"+provider+"'" for provider in selected_providers]) if selected_providers and len(selected_providers) > 0 and "All" not in selected_providers else "",
+            "ServiceName": ", ".join(["'"+service+"'" for service in selected_services]) if selected_services and len(selected_services) > 0 and "All" not in selected_services else "",
+            "ResourceType": ", ".join(["'"+resourcetype+"'" for resourcetype in selected_resourcetypes]) if selected_resourcetypes and len(selected_resourcetypes) > 0 and "All" not in selected_resourcetypes else ""
+        }
+        print(f"Selections: {selections}")
+        return selections
