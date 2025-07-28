@@ -3,6 +3,7 @@ import dash_bootstrap_components as dbc
 
 from src.components.azure_cost_components.filters import get_filters_layout
 from src.components.azure_cost_components.azure_spending_trends import azure_spending_trends_layout
+from src.components.azure_cost_components.azure_cost_breakdown import azure_cost_breakdown_layout
 
 def create_azure_cost_layout():
     return dbc.Container([
@@ -36,14 +37,14 @@ def create_azure_cost_layout():
             dcc.Loading(
                 id="loading-weekly-trends",
                 type="dot",  # or "circle", "default", "cube"
-                children=html.Div(azure_spending_trends_layout(), id="azure-spending-trends-container")
+                children=html.Div(azure_spending_trends_layout(),id="azure-spending-trends-container")
             ),
             width=6),
             dbc.Col(
             dcc.Loading(
                 id="loading-app-usage-by-office",
                 type="dot",  # or "circle", "default", "cube"
-                children=html.Div(id="azure-cost-breakdown-container")
+                children=html.Div(azure_cost_breakdown_layout(), id="azure-cost-breakdown-container")
             ),
             width=6)        
         ])             
