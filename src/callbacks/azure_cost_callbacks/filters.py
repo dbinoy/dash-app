@@ -241,6 +241,7 @@ def register_azure_cost_filter_callbacks(app):
     
     @app.callback(
         Output("azure-cost-filtered-query-store", "data"), 
+        Input("azure-cost-filter-data-store", "data"), 
         Input("azure-cost-date-range-picker", "start_date"),
         Input("azure-cost-date-range-picker", "end_date"),    
         Input("tenant-dropdown", "value"),
@@ -251,10 +252,13 @@ def register_azure_cost_filter_callbacks(app):
         Input("resourcetype-dropdown", "value"),
     )
 
-    def filter_data_query(start_date, end_date, selected_tenants, selected_subscriptions, selected_resourcegroups, selected_providers, selected_services, selected_resourcetypes):
+    def filter_data_query(filter_data, start_date, end_date, selected_tenants, selected_subscriptions, selected_resourcegroups, selected_providers, selected_services, selected_resourcetypes):
+        df_earliest_and_latest_dates = pd.DataFrame(filter_data["earliest_and_latest_dates"])
+        start_placeholder = df_earliest_and_latest_dates["EarliestDay"][0]
+        end_placeholder = df_earliest_and_latest_dates["LatestDay"][0]        
         selections = {
-            "UsageDay_From": start_date if start_date is not None else "",
-            "UsageDay_To": end_date if end_date is not None else "",
+            "UsageDay_From": start_date if start_date is not None else start_placeholder,
+            "UsageDay_To": end_date if end_date is not None else end_placeholder,
             "Tenant": ", ".join(["'"+tenant+"'" for tenant in selected_tenants]) if selected_tenants and len(selected_tenants) > 0 and "All" not in selected_tenants else "",
             "SubscriptionName": ", ".join(["'"+subscription+"'" for subscription in selected_subscriptions]) if selected_subscriptions and len(selected_subscriptions) > 0 and "All" not in selected_subscriptions else "",
             "ResourceGroup": ", ".join(["'"+resourcegroup+"'" for resourcegroup in selected_resourcegroups]) if selected_resourcegroups and len(selected_resourcegroups) > 0 and "All" not in selected_resourcegroups else "",

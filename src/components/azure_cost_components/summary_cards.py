@@ -4,10 +4,11 @@ import dash_bootstrap_components as dbc
 def get_summary_cards_layout(filtered_data):
     # Aggregations
     total_cost = filtered_data['TotalCost']
-    # unique_users = filtered_data['UniqueUsers']
-    # avg_logins_per_user = filtered_data['AvgLoginsPerUser']
-    # most_used_app = filtered_data['MostUsedApp']
-    # top_office = filtered_data['TopOffice']
+    avg_daily_cost = filtered_data['AvgDailyCost']
+    max_daily_cost = filtered_data['MaxDailyCost']
+    unique_resources = filtered_data['UniqueResources']
+    cost_variance = filtered_data['CostVariance']
+    most_expensive_subscription = filtered_data['MostExpensiveSubscription']
 
     return dbc.Row([
         dbc.Col(dbc.Card([
@@ -16,28 +17,34 @@ def get_summary_cards_layout(filtered_data):
                 html.P("Total Cost (USD)", className="card-text")
             ])
         ]), width=2),
-        # dbc.Col(dbc.Card([
-        #     dbc.CardBody([
-        #         html.H4(f"{unique_users}", className="card-title"),
-        #         html.P("Unique Users", className="card-text")
-        #     ])
-        # ]), width=2),
-        # dbc.Col(dbc.Card([
-        #     dbc.CardBody([
-        #         html.H4(f"{avg_logins_per_user}", className="card-title"),
-        #         html.P("Avg Logins per User", className="card-text")
-        #     ])
-        # ]), width=2),
-        # dbc.Col(dbc.Card([
-        #     dbc.CardBody([
-        #         html.H4(str(most_used_app), className="card-title"),
-        #         html.P("Most Used App", className="card-text")
-        #     ])
-        # ]), width=3),
-        # dbc.Col(dbc.Card([
-        #     dbc.CardBody([
-        #         html.H4(str(top_office), className="card-title"),
-        #         html.P("Top Office", className="card-text")
-        #     ])
-        # ]), width=3)
+        dbc.Col(dbc.Card([
+            dbc.CardBody([
+                html.H4(f"{avg_daily_cost}", className="card-title"),
+                html.P("Avg Daily Cost(USD)", className="card-text")
+            ])
+        ]), width=2),
+        dbc.Col(dbc.Card([
+            dbc.CardBody([
+                html.H4(f"{max_daily_cost}", className="card-title"),
+                html.P("Max Daily Cost(USD)", className="card-text")
+            ])
+        ]), width=2),
+        dbc.Col(dbc.Card([
+            dbc.CardBody([
+                html.H4(f"{most_expensive_subscription}", className="card-title"),
+                html.P("Most Expensive", className="card-text")
+            ])
+        ]), width=2),         
+        dbc.Col(dbc.Card([
+            dbc.CardBody([
+                html.H4(f"{unique_resources}", className="card-title"),
+                html.P("Unique Resources", className="card-text")
+            ])
+        ]), width=2),
+        dbc.Col(dbc.Card([
+            dbc.CardBody([
+                html.H4(f"{cost_variance}", className="card-title"),
+                html.P("Cost Variance", className="card-text")
+            ])
+        ]), width=2)       
     ])
