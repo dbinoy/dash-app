@@ -1,7 +1,6 @@
 from dash import html, dcc
 import dash_bootstrap_components as dbc
 from src.components.app_usage_components.filters import get_filters_layout
-from src.components.app_usage_components.summary_cards import get_summary_cards_layout
 from src.components.app_usage_components.weekly_login_trends import weekly_login_trends_layout
 from src.components.app_usage_components.app_usage_by_office import app_usage_by_office_layout
 from src.components.app_usage_components.user_activity_distribution import user_activity_distribution_layout

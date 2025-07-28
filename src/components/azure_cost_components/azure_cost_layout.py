@@ -2,6 +2,7 @@ from dash import html, dcc
 import dash_bootstrap_components as dbc
 
 from src.components.azure_cost_components.filters import get_filters_layout
+from src.components.azure_cost_components.azure_spending_trends import azure_spending_trends_layout
 
 def create_azure_cost_layout():
     return dbc.Container([
@@ -29,16 +30,21 @@ def create_azure_cost_layout():
             type="default",  # or "circle", "dot", "cube"
             children=html.Div(id="azure-cost-summary-cards-container")
         ),
-        html.Br()                 
+        html.Br(),
+        dbc.Row([
+            dbc.Col(
+            dcc.Loading(
+                id="loading-weekly-trends",
+                type="dot",  # or "circle", "default", "cube"
+                children=html.Div(azure_spending_trends_layout(), id="azure-spending-trends-container")
+            ),
+            width=6),
+            dbc.Col(
+            dcc.Loading(
+                id="loading-app-usage-by-office",
+                type="dot",  # or "circle", "default", "cube"
+                children=html.Div(id="azure-cost-breakdown-container")
+            ),
+            width=6)        
+        ])             
     ], fluid=True)    
-    # return html.Div([
-    #     dbc.Row([
-    #         dbc.Col(html.H1("Azure Cost Analysis"), width=12)
-    #     ]),
-    #     dbc.Row([
-    #         dbc.Col(html.P("This section provides insights into Azure costs."), width=12)
-    #     ]),
-    #     dbc.Row([
-    #         dbc.Col(dbc.Button("View Costs", color="primary"), width={"size": 2, "offset": 5})
-    #     ])
-    # ])

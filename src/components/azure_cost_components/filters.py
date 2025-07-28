@@ -43,11 +43,11 @@ def get_filters_layout():
                 ], width=2), 
                 dbc.Col([
                     html.Div([
-                        html.Label("ResourceGroup"),
+                        html.Label("Resource Group"),
                         dcc.Dropdown(
                             id="resourcegroup-dropdown", 
                             options=[],
-                            placeholder="Select ResourceGroup",
+                            placeholder="Select Resource Group",
                             multi=True,
                             disabled=False
                         )
@@ -69,11 +69,11 @@ def get_filters_layout():
                 ], width=4), 
                 dbc.Col([
                     html.Div([
-                        html.Label("Service"),
+                        html.Label("Service Name"),
                         dcc.Dropdown(
                             id="service-dropdown", 
                             options=[],
-                            placeholder="Select Service",
+                            placeholder="Select Service Name",
                             multi=True,
                             disabled=False
                         )
@@ -81,11 +81,11 @@ def get_filters_layout():
                 ], width=4), 
                 dbc.Col([
                     html.Div([
-                        html.Label("ResourceType"),
+                        html.Label("Resource Type"),
                         dcc.Dropdown(
                             id="resourcetype-dropdown", 
                             options=[],
-                            placeholder="Select ResourceType",
+                            placeholder="Select Resource Type",
                             multi=True,
                             disabled=False
                         )

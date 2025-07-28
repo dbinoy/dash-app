@@ -105,7 +105,7 @@ def register_azure_cost_filter_callbacks(app):
         else:
             selected_subscriptions = ' '
 
-        resourcegroup_options = [{"label": f"All{selected_subscriptions}ResourceGroups", "value": "All"}]
+        resourcegroup_options = [{"label": f"All{selected_subscriptions}Resource Groups", "value": "All"}]
 
         if len(filtered_resourcegroup) < len(unique_resourcegroups):
             resourcegroup_options = resourcegroup_options + [{"label":"Blank", "value":""}]
@@ -166,7 +166,7 @@ def register_azure_cost_filter_callbacks(app):
         if selected_providers and len(selected_providers) != 0 and "All" not in selected_providers:  
             df_unique_service_providers = df_unique_service_providers[df_unique_service_providers["Provider"].isin(selected_providers)]     
 
-        provider_options = [{"label": f"All Services", "value": "All"}]+[{"label": str(v), "value": v} for v in df_unique_service_providers["ServiceName"].unique() if pd.notnull(v)]
+        provider_options = [{"label": f"All Service Names", "value": "All"}]+[{"label": str(v), "value": v} for v in df_unique_service_providers["ServiceName"].unique() if pd.notnull(v)]
         return provider_options    
 
     @app.callback(
@@ -178,7 +178,7 @@ def register_azure_cost_filter_callbacks(app):
         Input("azure-cost-filter-data-store", "data"),    
         prevent_initial_call=True
     )
-    def populate_service_filter(selected_subscriptions, selected_resourcegroups, selected_providers, selected_services, filter_data):
+    def populate_resourcetype_filter(selected_subscriptions, selected_resourcegroups, selected_providers, selected_services, filter_data):
         if not filter_data:
             return []
         
@@ -207,7 +207,7 @@ def register_azure_cost_filter_callbacks(app):
         df_unique_resource_types = df_unique_resource_types[df_unique_resource_types["ProviderUsed"].apply(
             lambda x: any(provider.strip() in df_unique_service_providers['Provider'].tolist() for provider in x.split(','))
         )]
-        resourcetype_options = [{"label": f"All ResourceTypes", "value": "All"}]+[{"label": str(v), "value": v} for v in df_unique_resource_types["ResourceType"].unique() if pd.notnull(v)]
+        resourcetype_options = [{"label": f"All Resource Types", "value": "All"}]+[{"label": str(v), "value": v} for v in df_unique_resource_types["ResourceType"].unique() if pd.notnull(v)]
         return resourcetype_options    
     
     @app.callback(
@@ -251,7 +251,6 @@ def register_azure_cost_filter_callbacks(app):
         Input("service-dropdown", "value"),
         Input("resourcetype-dropdown", "value"),
     )
-
     def filter_data_query(filter_data, start_date, end_date, selected_tenants, selected_subscriptions, selected_resourcegroups, selected_providers, selected_services, selected_resourcetypes):
         df_earliest_and_latest_dates = pd.DataFrame(filter_data["earliest_and_latest_dates"])
         start_placeholder = df_earliest_and_latest_dates["EarliestDay"][0]
@@ -266,5 +265,4 @@ def register_azure_cost_filter_callbacks(app):
             "ServiceName": ", ".join(["'"+service+"'" for service in selected_services]) if selected_services and len(selected_services) > 0 and "All" not in selected_services else "",
             "ResourceType": ", ".join(["'"+resourcetype+"'" for resourcetype in selected_resourcetypes]) if selected_resourcetypes and len(selected_resourcetypes) > 0 and "All" not in selected_resourcetypes else ""
         }
-        print(f"Selections: {selections}")
         return selections
