@@ -47,15 +47,12 @@ def get_azure_cost_breakdown_figure(df, group_by):
             title= f"Azure Cost Breakdown by {', '.join(group_by.split(','))}"
         )        
     else:
-        fig = px.treemap(title= f"Azure Cost Breakdown by {', '.join(group_by.split(','))}")         
+        fig = px.treemap(title= f"Azure Cost Breakdown by {', '.join(group_by.split(','))}")           
     fig.update_traces(
-        textinfo="label+value+percent entry",  
-        marker=dict(
-            line=dict(width=2, color='white')  
-        )
-    )         
+        hovertemplate="<b>%{label}</b><br>Cost: $%{value:,.2f}<br>Percentage: %{percentParent:,.2f}<extra></extra>"
+    )   
     fig.update_layout(
-        margin=dict(t=40, l=0, r=0, b=0),
+        margin={"t": 10, "l": 10, "r": 10, "b": 10},
         font=dict(size=14, family="Arial"),
         title_font=dict(size=20, family="Arial", color="darkblue"),
         coloraxis_colorbar=dict(
