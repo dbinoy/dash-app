@@ -4,6 +4,7 @@ import dash_bootstrap_components as dbc
 from src.components.azure_cost_components.filters import get_filters_layout
 from src.components.azure_cost_components.azure_spending_trends import azure_spending_trends_layout
 from src.components.azure_cost_components.azure_cost_breakdown import azure_cost_breakdown_layout
+from src.components.azure_cost_components.azure_cost_drivers import azure_cost_drivers_layout
 
 def create_azure_cost_layout():
     return dbc.Container([
@@ -47,5 +48,15 @@ def create_azure_cost_layout():
                 children=html.Div(azure_cost_breakdown_layout(), id="azure-cost-breakdown-container")
             ),
             width=6)        
-        ])             
+        ]),
+        html.Br(),
+        dbc.Row([
+            dbc.Col(
+            dcc.Loading(
+                id="loading-cost-drivers",
+                type="dot",  # or "circle", "default", "cube"
+                children=html.Div(azure_cost_drivers_layout(), id="azure-cost-drivers-container")
+            ),
+            width=12)     
+        ])                      
     ], fluid=True)    
