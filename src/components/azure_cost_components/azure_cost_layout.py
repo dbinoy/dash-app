@@ -5,6 +5,7 @@ from src.components.azure_cost_components.filters import get_filters_layout
 from src.components.azure_cost_components.azure_spending_trends import azure_spending_trends_layout
 from src.components.azure_cost_components.azure_cost_breakdown import azure_cost_breakdown_layout
 from src.components.azure_cost_components.azure_cost_drivers import azure_cost_drivers_layout
+from src.components.azure_cost_components.azure_spending_heatmap import azure_spending_heatmap_layout
 
 def create_azure_cost_layout():
     return dbc.Container([
@@ -40,14 +41,7 @@ def create_azure_cost_layout():
                 type="dot",  # or "circle", "default", "cube"
                 children=html.Div(azure_spending_trends_layout(),id="azure-spending-trends-container")
             ),
-            width=6),
-            dbc.Col(
-            dcc.Loading(
-                id="loading-app-usage-by-office",
-                type="dot",  # or "circle", "default", "cube"
-                children=html.Div(azure_cost_breakdown_layout(), id="azure-cost-breakdown-container")
-            ),
-            width=6)        
+            width=12)     
         ]),
         html.Br(),
         dbc.Row([
@@ -58,5 +52,22 @@ def create_azure_cost_layout():
                 children=html.Div(azure_cost_drivers_layout(), id="azure-cost-drivers-container")
             ),
             width=12)     
-        ])                      
+        ]),
+        html.Br(),
+        dbc.Row([
+            dbc.Col(
+            dcc.Loading(
+                id="loading-app-usage-by-office",
+                type="dot",  # or "circle", "default", "cube"
+                children=html.Div(azure_cost_breakdown_layout(), id="azure-cost-breakdown-container")
+            ),
+            width=6),               
+            dbc.Col(
+            dcc.Loading(
+                id="loading-spending-heatmap",
+                type="dot",  # or "circle", "default", "cube"
+                children=html.Div(azure_spending_heatmap_layout(), id="azure-spending-heatmap-container")
+            ),
+            width=6)     
+        ])                                
     ], fluid=True)    

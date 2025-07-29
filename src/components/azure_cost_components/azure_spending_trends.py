@@ -35,7 +35,7 @@ def azure_spending_trends_layout():
                     )
                 ], width=6)                
             ]),
-            dcc.Graph(id="azure-spending-trends-graph")
+            dcc.Graph(id="azure-spending-trends-graph", style={"height": "600px"})
         ])
     ])
 
@@ -101,14 +101,15 @@ def get_azure_spending_trends_figure(df, time_aggregation, group_by):
         legend_title=group_by,
         legend=dict(
             orientation="h",
-            yanchor="bottom",
-            y=-1,
+            yanchor="top",
+            y=-0.1,
             xanchor="center",
             x=0.5,
             bgcolor='rgba(255,255,255,0.5)',  # semi-transparent white
             bordercolor='rgba(0,0,0,0)',
             borderwidth=0,
             font=dict(size=12)
-        )           
+        )    ,
+        margin={"t": 30, "l": 0, "r": 0, "b": 0},       
     )
     return fig        

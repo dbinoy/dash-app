@@ -9,7 +9,9 @@ def azure_cost_breakdown_layout():
         dbc.CardBody([
             dbc.Row([
                 dbc.Col([
-                    html.Label("Grouping Level: "),
+                    html.Label("Grouping Level: ")
+                ], width=2),                 
+                dbc.Col([
                     dcc.Dropdown(
                         id="total-spending-breakdown-dropdown",
                         options=[
@@ -20,10 +22,10 @@ def azure_cost_breakdown_layout():
                         value="ServiceName",
                         clearable=False,
                     )
-                ], width=6),            
+                ], width=4),            
             ]),
-            dcc.Graph(id="azure-total-spending-breakdown-graph")
-        ])
+            dcc.Graph(id="azure-total-spending-breakdown-graph", style={"height": "800px"})
+        ], style={"minHeight": "600px"})
     ])
 
 def get_azure_cost_breakdown_figure(df, group_by):
@@ -52,7 +54,7 @@ def get_azure_cost_breakdown_figure(df, group_by):
         hovertemplate="<b>%{label}</b><br>Cost: $%{value:,.2f}<br>Percentage: %{percentParent:,.2f}<extra></extra>"
     )   
     fig.update_layout(
-        margin={"t": 10, "l": 10, "r": 10, "b": 10},
+        margin={"t": 30, "l": 0, "r": 0, "b": 0},
         font=dict(size=14, family="Arial"),
         title_font=dict(size=20, family="Arial", color="darkblue"),
         coloraxis_colorbar=dict(

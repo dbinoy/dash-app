@@ -22,18 +22,18 @@ def azure_cost_drivers_layout():
                         value="SubscriptionName",
                         clearable=False,
                     )
-                ], width=3),  
+                ], width=2),  
                 dbc.Col([
                     html.Label("Top: "),
                     dcc.Slider(
                         id="azure-cost-driver-top-n-slider",
                         min=1,
-                        max=20,
+                        max=50,
                         step=1,
                         value=10,
-                        marks={i: str(i) for i in range(1, 21)}
+                        marks={i: str(i) for i in range(1, 51)}
                     )
-                ], width=9),                            
+                ], width=10),                            
             ]),
             dcc.Graph(id="azure-top-cost-drivers-graph")
         ])
@@ -85,7 +85,8 @@ def get_top_cost_driver_figure(df, by):
             xanchor="left",
             x=1.02
         ),
-        margin=dict(r=150)
+        margin={"t": 30, "l": 0, "r": 0, "b": 0}
+        # margin=dict(r=150)
     )        
     fig.update_traces(
         hovertemplate="<b>%{x}</b><br>" +
