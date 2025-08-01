@@ -11,6 +11,7 @@ def create_azure_cost_layout():
     return dbc.Container([
         dcc.Store(id="azure-cost-filtered-query-store"),
         dcc.Store(id="azure-cost-filter-data-store"),
+        dcc.Store(id="azure-cost-table-data-store"),
         dbc.Row([
             dbc.Col(html.H2("Azure Cost Analysis Dashboard"), width=8),
             dbc.Col(html.Img(src="https://images.plot.ly/logo/new-branding/plotly-logomark.png", height="40px"), width=4, style={"textAlign": "right"})
@@ -69,5 +70,18 @@ def create_azure_cost_layout():
                 children=html.Div(azure_spending_heatmap_layout(), id="azure-spending-heatmap-container")
             ),
             width=6)     
-        ])                                
+        ]),
+        dbc.Modal(
+            [
+                dbc.ModalHeader(dbc.Button("Close", id="close-chart-modal", className="ml-auto")),
+                dbc.ModalBody(html.Div(id="modal-chart-content"))
+            ],
+            id="chart-modal",
+            size="xl",
+            is_open=False,
+            centered=True,
+            scrollable=True,
+            backdrop="static",
+            style={"padding": "0"}
+        )                                        
     ], fluid=True)    

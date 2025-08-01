@@ -57,7 +57,7 @@ def azure_spending_heatmap_layout():
                     )
                 ], width=12),                            
             ]),            
-            dcc.Graph(id="azure-spending-heatmap-graph", style={"height": "710px"})
+            html.Div(dcc.Graph(id="azure-spending-heatmap-graph", style={"height": "710px"}), id="azure-spending-heatmap-graph-container", n_clicks=0) 
         ])
     ])
 

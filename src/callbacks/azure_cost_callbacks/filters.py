@@ -250,6 +250,7 @@ def register_azure_cost_filter_callbacks(app):
         Input("provider-dropdown", "value"),    
         Input("service-dropdown", "value"),
         Input("resourcetype-dropdown", "value"),
+        prevent_initial_call=True
     )
     def filter_data_query(filter_data, start_date, end_date, selected_tenants, selected_subscriptions, selected_resourcegroups, selected_providers, selected_services, selected_resourcetypes):
         df_earliest_and_latest_dates = pd.DataFrame(filter_data["earliest_and_latest_dates"])
@@ -266,3 +267,36 @@ def register_azure_cost_filter_callbacks(app):
             "ResourceType": ", ".join(["'"+resourcetype+"'" for resourcetype in selected_resourcetypes]) if selected_resourcetypes and len(selected_resourcetypes) > 0 and "All" not in selected_resourcetypes else ""
         }
         return selections
+    
+    @app.callback(
+        Output("azure-cost-table-data-store", "data"),  
+        Input("azure-cost-filtered-query-store", "data"), 
+        prevent_initial_call=True
+    )
+    def fetch_table_data(selections):
+        table_name = f"[azure_daily_cost_by_tenant_subscriptionname_resourcegroup_provider_servicename_resourcetype]"
+        fields = "[UsageDay], [SubscriptionName], [ResourceGroup], [ServiceName]"
+        select_clause = f"SELECT {fields}, SUM([TotalCostUSD]) as TotalCost FROM [consumable].{table_name}"
+        group_by_clause = f"GROUP BY {fields}"
+
+        where_clause = f"WHERE 1=1"        
+        for k in selections.keys():
+            if selections[k] and selections[k] != "All":
+                match k:
+                    case "UsageDay_From":
+                        where_clause = f"{where_clause} AND [UsageDay] >= CAST('{selections[k]}' AS DATE)"
+                    case "UsageDay_To":
+                        where_clause = f"{where_clause} AND [UsageDay] <= CAST('{selections[k]}' AS DATE)"
+                    case _:
+                        where_clause = f"{where_clause} AND [{k}] IN ({selections[k]})"
+
+        q_table_data_query = f"{select_clause} {where_clause} {group_by_clause}"
+        queries = {
+            "table_data": q_table_data_query
+        }   
+        results = run_queries(queries, len(queries.keys()))    
+        table_data = {
+            "table_data": results["table_data"].to_dict("records")
+        }
+
+        return table_data

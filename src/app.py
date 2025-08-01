@@ -7,7 +7,17 @@ from src.components.azure_cost_components.azure_cost_layout import create_azure_
 from src.components.welcome_layout import welcome_layout
 from src.callbacks import register_all_callbacks
 
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+
+external_scripts=[
+    "https://code.jquery.com/jquery-3.6.0.min.js",
+    "https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"
+]
+
+app = dash.Dash(
+    __name__, 
+    external_stylesheets=[ dbc.themes.BOOTSTRAP,"https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css"], 
+    external_scripts=external_scripts
+)
 app.title = "Analytics Dashboard"
 app.config.suppress_callback_exceptions = True
 server = app.server

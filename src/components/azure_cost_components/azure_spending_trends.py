@@ -35,7 +35,7 @@ def azure_spending_trends_layout():
                     )
                 ], width=6)                
             ]),
-            dcc.Graph(id="azure-spending-trends-graph", style={"height": "600px"})
+            html.Div(dcc.Graph(id="azure-spending-trends-graph", style={"height": "600px"}), id="azure-spending-trends-graph-container", n_clicks=0) 
         ])
     ])
 

@@ -24,7 +24,7 @@ def azure_cost_breakdown_layout():
                     )
                 ], width=4),            
             ]),
-            dcc.Graph(id="azure-total-spending-breakdown-graph", style={"height": "800px"})
+            html.Div(dcc.Graph(id="azure-total-spending-breakdown-graph", style={"height": "800px"}), id="azure-total-spending-breakdown-graph-container", n_clicks=0)             
         ], style={"minHeight": "600px"})
     ])
 

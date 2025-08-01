@@ -35,7 +35,8 @@ def azure_cost_drivers_layout():
                     )
                 ], width=10),                            
             ]),
-            dcc.Graph(id="azure-top-cost-drivers-graph")
+            html.Div(dcc.Graph(id="azure-top-cost-drivers-graph"), id="azure-top-cost-drivers-graph-container", n_clicks=0) 
+            
         ])
     ])
 

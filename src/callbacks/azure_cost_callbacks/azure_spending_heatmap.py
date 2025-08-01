@@ -70,7 +70,7 @@ def register_callbacks(app):
 
     @app.callback(
         Output("azure-spending-heatmap-graph", "figure"),
-        Input("azure-cost-filtered-query-store", "data"),
+        Input("azure-cost-table-data-store", "data"),
         Input("azure-spending-heatmap-top-n-slider", "value"),
         Input("spending-heatmap-subscription-dropdown", "value"),        
         Input("spending-heatmap-service-dropdown", "value"),
@@ -78,32 +78,8 @@ def register_callbacks(app):
         Input("spending-heatmap-subscription-dropdown", "options"),        
         Input("spending-heatmap-service-dropdown", "options"),
     )
-    def update_azure_cost_breakdown(selections, top_n, selected_subscriptions, selected_services, time_period, subscription_options, service_options):
-        table_name = f"[azure_daily_cost_by_tenant_subscriptionname_resourcegroup_provider_servicename_resourcetype]"
-        fields = "[UsageDay], [SubscriptionName], [ResourceGroup], [ServiceName]"
-        select_clause = f"SELECT {fields}, SUM([TotalCostUSD]) as TotalCost FROM [consumable].{table_name}"
-        group_by_clause = f"GROUP BY {fields}"
-
-        where_clause = f"WHERE 1=1"        
-        for k in selections.keys():
-            if selections[k] and selections[k] != "All":
-                match k:
-                    case "UsageDay_From":
-                        where_clause = f"{where_clause} AND [UsageDay] >= CAST('{selections[k]}' AS DATE)"
-                    case "UsageDay_To":
-                        where_clause = f"{where_clause} AND [UsageDay] <= CAST('{selections[k]}' AS DATE)"
-                    case _:
-                        where_clause = f"{where_clause} AND [{k}] IN ({selections[k]})"
-
-        q_cost_aggregation = f"{select_clause} {where_clause} {group_by_clause}"
-
-        queries = {
-            "cost_aggregation": q_cost_aggregation
-        }   
-
-        results = run_queries(queries, len(queries.keys()))    
-
-        filtered_df = results["cost_aggregation"]
+    def update_azure_cost_breakdown(table_data, top_n, selected_subscriptions, selected_services, time_period, subscription_options, service_options):
+        filtered_df = pd.DataFrame(table_data["table_data"])
         filtered_df = filtered_df.dropna(subset=['TotalCost'])
         filtered_df['TotalCost'] = pd.to_numeric(filtered_df['TotalCost'], errors='coerce')
         filtered_df['UsageDay'] = pd.to_datetime(filtered_df['UsageDay'], errors='coerce')        
