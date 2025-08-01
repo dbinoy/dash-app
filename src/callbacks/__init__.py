@@ -13,6 +13,7 @@ from src.callbacks.azure_cost_callbacks.azure_spending_trends import register_ca
 from src.callbacks.azure_cost_callbacks.azure_cost_breakdown import register_callbacks as register_azure_cost_breakdown_callbacks
 from src.callbacks.azure_cost_callbacks.azure_cost_drivers import register_callbacks as register_azure_cost_drivers_callbacks
 from src.callbacks.azure_cost_callbacks.azure_spending_heatmap import register_callbacks as register_azure_spending_heatmap_callbacks
+from src.callbacks.azure_cost_callbacks.azure_cost_data_table_view import register_callbacks as register_azure_cost_data_table_view_callbacks
 
 def register_all_callbacks(app):
     register_filters_callbacks(app)
@@ -30,3 +31,4 @@ def register_all_callbacks(app):
     register_azure_cost_breakdown_callbacks(app)
     register_azure_cost_drivers_callbacks(app)
     register_azure_spending_heatmap_callbacks(app)
+    register_azure_cost_data_table_view_callbacks(app)

@@ -6,6 +6,7 @@ from src.components.azure_cost_components.azure_spending_trends import azure_spe
 from src.components.azure_cost_components.azure_cost_breakdown import azure_cost_breakdown_layout
 from src.components.azure_cost_components.azure_cost_drivers import azure_cost_drivers_layout
 from src.components.azure_cost_components.azure_spending_heatmap import azure_spending_heatmap_layout
+from src.components.azure_cost_components.azure_cost_data_table_view import azure_cost_data_table_view_layout
 
 def create_azure_cost_layout():
     return dbc.Container([
@@ -71,6 +72,11 @@ def create_azure_cost_layout():
             ),
             width=6)     
         ]),
+        dcc.Loading(
+            id="loading-data-table-view",
+            type="circle",  # or "dot", "default", "cube"
+            children=html.Div(azure_cost_data_table_view_layout(), id="data-table-view-container")
+        ),           
         dbc.Modal(
             [
                 dbc.ModalHeader(dbc.Button("Close", id="close-chart-modal", className="ml-auto")),
