@@ -15,6 +15,7 @@ def azure_cost_data_table_view_layout():
                     {"name": "ResourceGroup", "id": "ResourceGroup"},
                     {"name": "Provider", "id": "userProviderd"},
                     {"name": "ServiceName", "id": "ServiceName"},
+                    {"name": "ReservationId", "id": "ReservationId"},
                     {"name": "ResourceType", "id": "ResourceType"},
                     {"name": "TotalCost", "id": "TotalCost"}                    
                 ],

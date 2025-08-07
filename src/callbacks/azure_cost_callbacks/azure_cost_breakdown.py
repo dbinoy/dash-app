@@ -10,7 +10,7 @@ def register_callbacks(app):
         Input("total-spending-breakdown-dropdown", "value")
     )
     def update_azure_cost_breakdown(selections, group_by):
-        table_name = f"[azure_monthly_cost_by_tenant_subscriptionname_resourcegroup_provider_servicename_resourcetype]"
+        table_name = f"[azure_monthly_cost_by_tenant_subscriptionname_resourcegroup_provider_servicename_reservationid_resourcetype]"
         group_by_clause = ', '.join(['['+group+']' for group in group_by.split(",")])
         fields = f'{group_by_clause}, SUM([TotalCostUSD]) AS TotalCost'
         where_clause = f"WHERE 1=1"

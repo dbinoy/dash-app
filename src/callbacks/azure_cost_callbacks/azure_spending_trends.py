@@ -11,7 +11,7 @@ def register_callbacks(app):
         Input("spending-trend-group-by-dropdown", "value")  
     )
     def update_azure_spending_trends(selections, time_aggregation, group_by):
-        table_name = f"[azure_{time_aggregation}_cost_by_tenant_subscriptionname_resourcegroup_provider_servicename_resourcetype]"
+        table_name = f"[azure_{time_aggregation}_cost_by_tenant_subscriptionname_resourcegroup_provider_servicename_reservationid_resourcetype]"
         fields = f'SUM([TotalCostUSD]) AS {time_aggregation.capitalize()}Cost'
         group_by_clause = ''
         where_clause = f"WHERE 1=1"

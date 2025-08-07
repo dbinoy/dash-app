@@ -4,7 +4,7 @@ from datetime import datetime
 from src.utils.db import run_queries
 from src.components.azure_cost_components.summary_cards import get_summary_cards_layout
 
-def create_query_filter(selections, table_name="azure_daily_cost_by_tenant_subscriptionname_resourcegroup_provider_servicename_resourcetype", include_date=True, use_keys = []):
+def create_query_filter(selections, table_name="azure_daily_cost_by_tenant_subscriptionname_resourcegroup_provider_servicename_reservationid_resourcetype", include_date=True, use_keys = []):
     query = f" FROM consumable.{table_name} WHERE 1=1"
     for k in selections.keys():
         if selections[k] and selections[k] != "All":
@@ -59,7 +59,7 @@ def register_callbacks(app):
         else:
             total_cost = ""      
         
-        cost_variance = stdev_cost / avg_daily_cost if avg_daily_cost > 0 else 0
+        cost_variance = stdev_cost / avg_daily_cost if avg_daily_cost and avg_daily_cost > 0 and stdev_cost and stdev_cost > 0 else 0
 
         if avg_daily_cost is not None and avg_daily_cost > 0:
             avg_daily_cost = f"${avg_daily_cost:,.2f}"

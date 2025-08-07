@@ -10,8 +10,8 @@ def register_callbacks(app):
     )
     def update_data_table(selections):
 
-        q_azure_cost_data = 'SELECT [UsageDay], [SubscriptionName], [ResourceGroup], [Provider], [ServiceName], [ResourceType], SUM([TotalCostUSD]) as TotalCost ' \
-        'FROM consumable.azure_daily_cost_by_tenant_subscriptionname_resourcegroup_provider_servicename_resourcetype '
+        q_azure_cost_data = 'SELECT [UsageDay], [SubscriptionName], [ResourceGroup], [Provider], [ServiceName], [ReservationId], [ResourceType], SUM([TotalCostUSD]) as TotalCost ' \
+        'FROM consumable.azure_daily_cost_by_tenant_subscriptionname_resourcegroup_provider_servicename_reservationid_resourcetype '
 
         filtered_query = "WHERE 1=1 "
         for k in selections.keys():
@@ -24,10 +24,10 @@ def register_callbacks(app):
                     case _:
                         filtered_query += f"AND [{k}] IN ({selections[k]}) "
 
-        filtered_query += 'GROUP BY [SubscriptionName], [ResourceGroup], [Provider], [ServiceName], [ResourceType], [UsageDay] '
+        filtered_query += 'GROUP BY [SubscriptionName], [ResourceGroup], [Provider], [ServiceName], [ReservationId], [ResourceType], [UsageDay] '
 
         # Add ordering to the query
-        filtered_query += 'ORDER BY [UsageDay], [SubscriptionName], [ResourceGroup], [Provider], [ServiceName], [ResourceType] '
+        filtered_query += 'ORDER BY [UsageDay], [SubscriptionName], [ResourceGroup], [Provider], [ServiceName], [ReservationId], [ResourceType] '
 
         # Limit to 10000 rows
         filtered_query += 'OFFSET 0 ROWS FETCH NEXT 10000 ROWS ONLY'

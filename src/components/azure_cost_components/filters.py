@@ -66,7 +66,7 @@ def get_filters_layout():
                             disabled=False
                         )
                     ], className="d-grid gap-1")
-                ], width=4), 
+                ], width=2), 
                 dbc.Col([
                     html.Div([
                         html.Label("Service Name"),
@@ -74,6 +74,18 @@ def get_filters_layout():
                             id="service-dropdown", 
                             options=[],
                             placeholder="Select Service Name",
+                            multi=True,
+                            disabled=False
+                        )
+                    ], className="d-grid gap-1")
+                ], width=2), 
+                dbc.Col([
+                    html.Div([
+                        html.Label("Reservation Id"),
+                        dcc.Dropdown(
+                            id="reservation-dropdown", 
+                            options=[],
+                            placeholder="Select Reservation Id",
                             multi=True,
                             disabled=False
                         )

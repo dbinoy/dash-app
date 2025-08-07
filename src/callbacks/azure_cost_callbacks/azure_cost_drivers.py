@@ -11,7 +11,7 @@ def register_callbacks(app):
         Input("azure-cost-driver-top-n-slider", "value"),
     )
     def update_azure_cost_breakdown(selections, by, top_n):
-        table_name = f"[azure_monthly_cost_by_tenant_subscriptionname_resourcegroup_provider_servicename_resourcetype]"
+        table_name = f"[azure_monthly_cost_by_tenant_subscriptionname_resourcegroup_provider_servicename_reservationid_resourcetype]"
         select_clause = f"SELECT TOP {top_n} [{by}], SUM(TotalCostUSD) AS TotalCost FROM [consumable].{table_name}"
 
         where_clause = f"WHERE 1=1"        

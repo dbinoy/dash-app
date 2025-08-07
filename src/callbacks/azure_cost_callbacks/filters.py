@@ -14,13 +14,15 @@ def register_azure_cost_filter_callbacks(app):
         q_unique_subscriptions = 'SELECT [Tenant], [SubscriptionName] FROM [consumable].[azure_subscriptions] ORDER BY [SubscriptionName]'
         q_unique_service_providers = 'SELECT [Provider], [ServiceName], [ResourceGroupsUsed], [SubscriptionsUsed] FROM [consumable].[azure_service_providers] ORDER BY [Provider], [ServiceName]'
         q_unique_resource_types = 'SELECT [ResourceType], [ServiceUsed], [ProviderUsed] FROM [consumable].[azure_resource_types]'
+        q_unique_reservations = 'SELECT [ReservationId], [ResourceGroupsUsed], [SubscriptionsUsed] FROM [consumable].[azure_reservations]'
 
         queries = {
             "earliest_and_latest_dates": q_earliest_and_latest_dates,
             "unique_tenants": q_unique_tenants,
             "unique_subscriptions": q_unique_subscriptions,
             "unique_service_providers": q_unique_service_providers,
-            "unique_resource_types": q_unique_resource_types
+            "unique_resource_types": q_unique_resource_types,
+            "unique_reservations": q_unique_reservations
         }    
         results = run_queries(queries, len(queries.keys()))
         filter_data = {
@@ -28,7 +30,8 @@ def register_azure_cost_filter_callbacks(app):
             "unique_tenants": results["unique_tenants"].to_dict("records"),
             "unique_subscriptions": results["unique_subscriptions"].to_dict("records"),
             "unique_service_providers": results["unique_service_providers"].to_dict("records"),
-            "unique_resource_types": results["unique_resource_types"].to_dict("records")
+            "unique_resource_types": results["unique_resource_types"].to_dict("records"),
+            "unique_reservations": results["unique_reservations"].to_dict("records")
         }
         
         unique_subscriptions = pd.DataFrame(filter_data["unique_subscriptions"])['SubscriptionName'].tolist()
@@ -170,6 +173,32 @@ def register_azure_cost_filter_callbacks(app):
         return provider_options    
 
     @app.callback(
+        Output("reservation-dropdown", "options"),
+        Input("subscription-dropdown", "value"),
+        Input("resourcegroup-dropdown", "value"),
+        Input("azure-cost-filter-data-store", "data"),    
+        prevent_initial_call=True
+    )
+    def populate_reservation_filter(selected_subscriptions, selected_resourcegroups, filter_data):
+        if not filter_data:
+            return []
+        
+        df_unique_reservations = pd.DataFrame(filter_data["unique_reservations"])   
+
+        if selected_subscriptions and len(selected_subscriptions) != 0 and "All" not in selected_subscriptions:
+            df_unique_reservations = df_unique_reservations[df_unique_reservations['SubscriptionsUsed'].apply(
+                lambda x: any(subscription.strip() in selected_subscriptions for subscription in x.split(','))
+            )]    
+
+        if selected_resourcegroups and len(selected_resourcegroups) != 0 and "All" not in selected_resourcegroups:
+            df_unique_reservations = df_unique_reservations[df_unique_reservations['ResourceGroupsUsed'].apply(
+                lambda x: any(resource.strip() in selected_resourcegroups for resource in x.split(','))
+            )]              
+
+        reservation_options = [{"label": f"All Reservation Id", "value": "All"}]+[{"label": str(v), "value": v} for v in df_unique_reservations["ReservationId"].unique() if pd.notnull(v)]
+        return reservation_options
+    
+    @app.callback(
         Output("resourcetype-dropdown", "options"),
         Input("subscription-dropdown", "value"),
         Input("resourcegroup-dropdown", "value"),
@@ -218,6 +247,7 @@ def register_azure_cost_filter_callbacks(app):
         Output("resourcegroup-dropdown", "value", allow_duplicate=True),
         Output("provider-dropdown", "value", allow_duplicate=True),
         Output("service-dropdown", "value", allow_duplicate=True),
+        Output("reservation-dropdown", "value", allow_duplicate=True),
         Output("resourcetype-dropdown", "value", allow_duplicate=True),
         Input("azure-cost-clear-filters-btn", "n_clicks"),
         Input("azure-cost-filter-data-store", "data"),    
@@ -229,6 +259,7 @@ def register_azure_cost_filter_callbacks(app):
         resourcegroup_default = []
         provider_default = []
         service_default = []
+        reservation_default = []
         resourcetype_default = []
         if not filter_data:
             date_start_default = ""
@@ -237,7 +268,7 @@ def register_azure_cost_filter_callbacks(app):
             df_earliest_and_latest_dates = pd.DataFrame(filter_data["earliest_and_latest_dates"])        
             date_start_default = df_earliest_and_latest_dates["EarliestDay"][0]
             date_end_default = df_earliest_and_latest_dates["LatestDay"][0]
-        return date_start_default, date_end_default, tenant_default, subscription_default, resourcegroup_default, provider_default, service_default, resourcetype_default
+        return date_start_default, date_end_default, tenant_default, subscription_default, resourcegroup_default, provider_default, service_default, reservation_default, resourcetype_default
     
     @app.callback(
         Output("azure-cost-filtered-query-store", "data"), 
@@ -249,10 +280,11 @@ def register_azure_cost_filter_callbacks(app):
         Input("resourcegroup-dropdown", "value"),
         Input("provider-dropdown", "value"),    
         Input("service-dropdown", "value"),
+        Input("reservation-dropdown", "value"),
         Input("resourcetype-dropdown", "value"),
         prevent_initial_call=True
     )
-    def filter_data_query(filter_data, start_date, end_date, selected_tenants, selected_subscriptions, selected_resourcegroups, selected_providers, selected_services, selected_resourcetypes):
+    def filter_data_query(filter_data, start_date, end_date, selected_tenants, selected_subscriptions, selected_resourcegroups, selected_providers, selected_services, selected_reservations, selected_resourcetypes):
         df_earliest_and_latest_dates = pd.DataFrame(filter_data["earliest_and_latest_dates"])
         start_placeholder = df_earliest_and_latest_dates["EarliestDay"][0]
         end_placeholder = df_earliest_and_latest_dates["LatestDay"][0]        
@@ -264,6 +296,7 @@ def register_azure_cost_filter_callbacks(app):
             "ResourceGroup": ", ".join(["'"+resourcegroup+"'" for resourcegroup in selected_resourcegroups]) if selected_resourcegroups and len(selected_resourcegroups) > 0 and "All" not in selected_resourcegroups else "",
             "Provider": ", ".join(["'"+provider+"'" for provider in selected_providers]) if selected_providers and len(selected_providers) > 0 and "All" not in selected_providers else "",
             "ServiceName": ", ".join(["'"+service+"'" for service in selected_services]) if selected_services and len(selected_services) > 0 and "All" not in selected_services else "",
+            "ReservationId": ", ".join(["'"+reservation+"'" for reservation in selected_reservations]) if selected_reservations and len(selected_reservations) > 0 and "All" not in selected_reservations else "",
             "ResourceType": ", ".join(["'"+resourcetype+"'" for resourcetype in selected_resourcetypes]) if selected_resourcetypes and len(selected_resourcetypes) > 0 and "All" not in selected_resourcetypes else ""
         }
         return selections
@@ -274,8 +307,8 @@ def register_azure_cost_filter_callbacks(app):
         prevent_initial_call=True
     )
     def fetch_table_data(selections):
-        table_name = f"[azure_daily_cost_by_tenant_subscriptionname_resourcegroup_provider_servicename_resourcetype]"
-        fields = "[UsageDay], [SubscriptionName], [ResourceGroup], [ServiceName]"
+        table_name = f"[azure_daily_cost_by_tenant_subscriptionname_resourcegroup_provider_servicename_reservationid_resourcetype]"
+        fields = "[UsageDay], [SubscriptionName], [ResourceGroup], [ServiceName], [ReservationId]"
         select_clause = f"SELECT {fields}, SUM([TotalCostUSD]) as TotalCost FROM [consumable].{table_name}"
         group_by_clause = f"GROUP BY {fields}"
 
