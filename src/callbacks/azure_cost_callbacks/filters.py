@@ -15,14 +15,21 @@ def register_azure_cost_filter_callbacks(app):
         q_unique_service_providers = 'SELECT [Provider], [ServiceName], [ResourceGroupsUsed], [SubscriptionsUsed] FROM [consumable].[azure_service_providers] ORDER BY [Provider], [ServiceName]'
         q_unique_resource_types = 'SELECT [ResourceType], [ServiceUsed], [ProviderUsed] FROM [consumable].[azure_resource_types]'
         q_unique_reservations = 'SELECT [ReservationId], [ResourceGroupsUsed], [SubscriptionsUsed] FROM [consumable].[azure_reservations]'
-
+        q_unique_app_tags = 'SELECT [App], [ResourceCount] FROM [consumable].[azure_unique_tags_App] ORDER BY [ResourceCount] DESC'
+        q_unique_costcenter_tags = 'SELECT [CostCenter], [ResourceCount] FROM [consumable].[azure_unique_tags_CostCenter] ORDER BY [ResourceCount] DESC'
+        q_unique_product_tags = 'SELECT [Product], [ResourceCount] FROM [consumable].[azure_unique_tags_Product] ORDER BY [ResourceCount] DESC'
+        q_unique_project_tags = 'SELECT [Project], [ResourceCount] FROM [consumable].[azure_unique_tags_Project] ORDER BY [ResourceCount] DESC'
         queries = {
             "earliest_and_latest_dates": q_earliest_and_latest_dates,
             "unique_tenants": q_unique_tenants,
             "unique_subscriptions": q_unique_subscriptions,
             "unique_service_providers": q_unique_service_providers,
             "unique_resource_types": q_unique_resource_types,
-            "unique_reservations": q_unique_reservations
+            "unique_reservations": q_unique_reservations,
+            "unique_app_tags": q_unique_app_tags,
+            "unique_costcenter_tags": q_unique_costcenter_tags,
+            "unique_product_tags": q_unique_product_tags,
+            "unique_project_tags": q_unique_project_tags
         }    
         results = run_queries(queries, len(queries.keys()))
         filter_data = {
@@ -31,13 +38,17 @@ def register_azure_cost_filter_callbacks(app):
             "unique_subscriptions": results["unique_subscriptions"].to_dict("records"),
             "unique_service_providers": results["unique_service_providers"].to_dict("records"),
             "unique_resource_types": results["unique_resource_types"].to_dict("records"),
-            "unique_reservations": results["unique_reservations"].to_dict("records")
+            "unique_reservations": results["unique_reservations"].to_dict("records"),
+            "unique_app_tags": results["unique_app_tags"].to_dict("records"),
+            "unique_costcenter_tags": results["unique_costcenter_tags"].to_dict("records"),
+            "unique_product_tags": results["unique_product_tags"].to_dict("records"),
+            "unique_project_tags": results["unique_project_tags"].to_dict("records")
         }
-        
         unique_subscriptions = pd.DataFrame(filter_data["unique_subscriptions"])['SubscriptionName'].tolist()
         queries = {}
         for subscription in unique_subscriptions:
-            queries[f"unique_resourcegroups_{subscription.replace('-', '_')}"] = f'SELECT [SubscriptionName], [ResourceGroup] FROM [consumable].[azure_resourcegroups_{subscription.replace('-', '_')}]ORDER BY [ResourceGroup]'   
+            if subscription is not None:
+                queries[f"unique_resourcegroups_{subscription.replace('-', '_')}"] = f'SELECT [SubscriptionName], [ResourceGroup] FROM [consumable].[azure_resourcegroups_{subscription.replace('-', '_')}]ORDER BY [ResourceGroup]'   
         results = run_queries(queries, len(queries.keys()))
         for key in results.keys():
             filter_data[key] = results[key].to_dict("records")
@@ -48,7 +59,7 @@ def register_azure_cost_filter_callbacks(app):
         Output("azure-cost-date-range-picker", "end_date_placeholder_text"),
         Output("tenant-dropdown", "options"),
         Input("azure-cost-filter-data-store", "data"),
-        prevent_initial_call=True
+        prevent_initial_call=False
     )
     def populate_date_and_tenant_filter(filter_data):
         if not filter_data:
@@ -97,9 +108,10 @@ def register_azure_cost_filter_callbacks(app):
 
         unique_subscriptions = df_unique_subscriptions['SubscriptionName'].tolist()
         for subscription in unique_subscriptions:
-            if (not selected_subscriptions) or ("All" in selected_subscriptions) or (subscription in selected_subscriptions):
-                df_unique_resourcegroups = pd.DataFrame(filter_data[f"unique_resourcegroups_{subscription.replace('-', '_')}"])
-                unique_resourcegroups.extend(df_unique_resourcegroups["ResourceGroup"].tolist())
+            if subscription is not None:
+                if (not selected_subscriptions) or ("All" in selected_subscriptions) or (subscription in selected_subscriptions):
+                    df_unique_resourcegroups = pd.DataFrame(filter_data[f"unique_resourcegroups_{subscription.replace('-', '_')}"])
+                    unique_resourcegroups.extend(df_unique_resourcegroups["ResourceGroup"].tolist())
         filtered_resourcegroup = sorted([s for s in unique_resourcegroups if s and len(s.strip()) > 0])
 
 
