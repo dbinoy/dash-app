@@ -15,10 +15,10 @@ def register_azure_cost_filter_callbacks(app):
         q_unique_service_providers = 'SELECT [Provider], [ServiceName], [ResourceGroupsUsed], [SubscriptionsUsed] FROM [consumable].[azure_service_providers] ORDER BY [Provider], [ServiceName]'
         q_unique_resource_types = 'SELECT [ResourceType], [ServiceUsed], [ProviderUsed] FROM [consumable].[azure_resource_types]'
         q_unique_reservations = 'SELECT [ReservationId], [ResourceGroupsUsed], [SubscriptionsUsed] FROM [consumable].[azure_reservations]'
-        q_unique_app_tags = 'SELECT [App], [ResourceCount] FROM [consumable].[azure_unique_tags_App] ORDER BY [ResourceCount] DESC'
-        q_unique_costcenter_tags = 'SELECT [CostCenter], [ResourceCount] FROM [consumable].[azure_unique_tags_CostCenter] ORDER BY [ResourceCount] DESC'
-        q_unique_product_tags = 'SELECT [Product], [ResourceCount] FROM [consumable].[azure_unique_tags_Product] ORDER BY [ResourceCount] DESC'
-        q_unique_project_tags = 'SELECT [Project], [ResourceCount] FROM [consumable].[azure_unique_tags_Project] ORDER BY [ResourceCount] DESC'
+        q_unique_app_tags = 'SELECT COALESCE([App], \'\') AS App, COALESCE([SubscriptionUsed], \'\') AS SubscriptionUsed, COALESCE([ResourceGroupUsed], \'\') AS ResourceGroupUsed FROM [consumable].[azure_tag_usages_App]'
+        q_unique_costcenter_tags = 'SELECT COALESCE([CostCenter], \'\') AS CostCenter, COALESCE([SubscriptionUsed], \'\') AS SubscriptionUsed, COALESCE([ResourceGroupUsed], \'\') AS ResourceGroupUsed FROM [consumable].[azure_tag_usages_CostCenter]'
+        q_unique_product_tags = 'SELECT COALESCE([Product], \'\') AS Product, COALESCE([SubscriptionUsed], \'\') AS SubscriptionUsed, COALESCE([ResourceGroupUsed], \'\') AS ResourceGroupUsed FROM [consumable].[azure_tag_usages_Product]'
+        q_unique_project_tags = 'SELECT COALESCE([Project], \'\') AS Project, COALESCE([SubscriptionUsed], \'\') AS SubscriptionUsed, COALESCE([ResourceGroupUsed], \'\') AS ResourceGroupUsed FROM [consumable].[azure_tag_usages_Project]'
         queries = {
             "earliest_and_latest_dates": q_earliest_and_latest_dates,
             "unique_tenants": q_unique_tenants,
@@ -252,6 +252,107 @@ def register_azure_cost_filter_callbacks(app):
         return resourcetype_options    
     
     @app.callback(
+        Output("app-tag-dropdown", "options"),
+        Input("subscription-dropdown", "value"),
+        Input("resourcegroup-dropdown", "value"),
+        Input("azure-cost-filter-data-store", "data"),    
+        prevent_initial_call=True
+    )
+    def populate_app_tag_filter(selected_subscriptions, selected_resourcegroups, filter_data):
+        if not filter_data:
+            return []
+        
+        df_unique_app_tags = pd.DataFrame(filter_data["unique_app_tags"])   
+        if selected_subscriptions and len(selected_subscriptions) != 0 and "All" not in selected_subscriptions:
+            df_unique_app_tags = df_unique_app_tags[df_unique_app_tags['SubscriptionUsed'].apply(
+                lambda x: any(subscription.strip() in selected_subscriptions for subscription in x.split(',') if x is not None)
+            )]    
+
+        if selected_resourcegroups and len(selected_resourcegroups) != 0 and "All" not in selected_resourcegroups:
+            df_unique_app_tags = df_unique_app_tags[df_unique_app_tags['ResourceGroupUsed'].apply(
+                lambda x: any(resource.strip() in selected_resourcegroups for resource in x.split(',') if x is not None)
+            )]             
+
+        tag_options = [{"label": f"All Apps", "value": "All"}]+[{"label": str(v), "value": v} for v in df_unique_app_tags["App"].unique() if pd.notnull(v)]
+        return tag_options
+    
+    @app.callback(
+        Output("costcenter-tag-dropdown", "options"),
+        Input("subscription-dropdown", "value"),
+        Input("resourcegroup-dropdown", "value"),
+        Input("azure-cost-filter-data-store", "data"),    
+        prevent_initial_call=True
+    )
+    def populate_costcenter_tag_filter(selected_subscriptions, selected_resourcegroups, filter_data):
+        if not filter_data:
+            return []
+        
+        df_unique_costcenter_tags = pd.DataFrame(filter_data["unique_costcenter_tags"])   
+        if selected_subscriptions and len(selected_subscriptions) != 0 and "All" not in selected_subscriptions:
+            df_unique_costcenter_tags = df_unique_costcenter_tags[df_unique_costcenter_tags['SubscriptionUsed'].apply(
+                lambda x: any(subscription.strip() in selected_subscriptions for subscription in x.split(',') if x is not None)
+            )]    
+
+        if selected_resourcegroups and len(selected_resourcegroups) != 0 and "All" not in selected_resourcegroups:
+            df_unique_costcenter_tags = df_unique_costcenter_tags[df_unique_costcenter_tags['ResourceGroupUsed'].apply(
+                lambda x: any(resource.strip() in selected_resourcegroups for resource in x.split(',') if x is not None)
+            )]             
+
+        tag_options = [{"label": f"All Cost Centers", "value": "All"}]+[{"label": str(v), "value": v} for v in df_unique_costcenter_tags["CostCenter"].unique() if pd.notnull(v)]
+        return tag_options    
+        
+    @app.callback(
+        Output("product-tag-dropdown", "options"),
+        Input("subscription-dropdown", "value"),
+        Input("resourcegroup-dropdown", "value"),
+        Input("azure-cost-filter-data-store", "data"),    
+        prevent_initial_call=True
+    )
+    def populate_product_tag_filter(selected_subscriptions, selected_resourcegroups, filter_data):
+        if not filter_data:
+            return []
+        
+        df_unique_product_tags = pd.DataFrame(filter_data["unique_product_tags"])   
+        if selected_subscriptions and len(selected_subscriptions) != 0 and "All" not in selected_subscriptions:
+            df_unique_product_tags = df_unique_product_tags[df_unique_product_tags['SubscriptionUsed'].apply(
+                lambda x: any(subscription.strip() in selected_subscriptions for subscription in x.split(',') if x is not None)
+            )]    
+
+        if selected_resourcegroups and len(selected_resourcegroups) != 0 and "All" not in selected_resourcegroups:
+            df_unique_product_tags = df_unique_product_tags[df_unique_product_tags['ResourceGroupUsed'].apply(
+                lambda x: any(resource.strip() in selected_resourcegroups for resource in x.split(',') if x is not None)
+            )]             
+
+        tag_options = [{"label": f"All Products", "value": "All"}]+[{"label": str(v), "value": v} for v in df_unique_product_tags["Product"].unique() if pd.notnull(v)]
+        return tag_options           
+    
+    @app.callback(
+        Output("project-tag-dropdown", "options"),
+        Input("subscription-dropdown", "value"),
+        Input("resourcegroup-dropdown", "value"),
+        Input("azure-cost-filter-data-store", "data"),    
+        prevent_initial_call=True
+    )
+    def populate_project_tag_filter(selected_subscriptions, selected_resourcegroups, filter_data):
+        if not filter_data:
+            return []
+        
+        df_unique_project_tags = pd.DataFrame(filter_data["unique_project_tags"])   
+        if selected_subscriptions and len(selected_subscriptions) != 0 and "All" not in selected_subscriptions:
+            df_unique_project_tags = df_unique_project_tags[df_unique_project_tags['SubscriptionUsed'].apply(
+                lambda x: any(subscription.strip() in selected_subscriptions for subscription in x.split(',') if x is not None)
+            )]    
+
+        if selected_resourcegroups and len(selected_resourcegroups) != 0 and "All" not in selected_resourcegroups:
+            df_unique_project_tags = df_unique_project_tags[df_unique_project_tags['ResourceGroupUsed'].apply(
+                lambda x: any(resource.strip() in selected_resourcegroups for resource in x.split(',') if x is not None)
+            )]             
+
+        tag_options = [{"label": f"All Projects", "value": "All"}]+[{"label": str(v), "value": v} for v in df_unique_project_tags["Project"].unique() if pd.notnull(v)]
+        return tag_options       
+
+    
+    @app.callback(
         Output("azure-cost-date-range-picker", "start_date", allow_duplicate=True),
         Output("azure-cost-date-range-picker", "end_date", allow_duplicate=True),
         Output("tenant-dropdown", "value", allow_duplicate=True),
@@ -261,6 +362,10 @@ def register_azure_cost_filter_callbacks(app):
         Output("service-dropdown", "value", allow_duplicate=True),
         Output("reservation-dropdown", "value", allow_duplicate=True),
         Output("resourcetype-dropdown", "value", allow_duplicate=True),
+        Output("app-tag-dropdown", "value", allow_duplicate=True),
+        Output("costcenter-tag-dropdown", "value", allow_duplicate=True),
+        Output("product-tag-dropdown", "value", allow_duplicate=True),
+        Output("project-tag-dropdown", "value", allow_duplicate=True),
         Input("azure-cost-clear-filters-btn", "n_clicks"),
         Input("azure-cost-filter-data-store", "data"),    
         prevent_initial_call=True
@@ -273,6 +378,10 @@ def register_azure_cost_filter_callbacks(app):
         service_default = []
         reservation_default = []
         resourcetype_default = []
+        app_tag_default = []
+        costcenter_tag_default = []
+        product_tag_default = []
+        project_tag_default = []
         if not filter_data:
             date_start_default = ""
             date_end_default = ""
@@ -280,7 +389,7 @@ def register_azure_cost_filter_callbacks(app):
             df_earliest_and_latest_dates = pd.DataFrame(filter_data["earliest_and_latest_dates"])        
             date_start_default = df_earliest_and_latest_dates["EarliestDay"][0]
             date_end_default = df_earliest_and_latest_dates["LatestDay"][0]
-        return date_start_default, date_end_default, tenant_default, subscription_default, resourcegroup_default, provider_default, service_default, reservation_default, resourcetype_default
+        return date_start_default, date_end_default, tenant_default, subscription_default, resourcegroup_default, provider_default, service_default, reservation_default, resourcetype_default, app_tag_default, costcenter_tag_default, product_tag_default, project_tag_default
     
     @app.callback(
         Output("azure-cost-filtered-query-store", "data"), 

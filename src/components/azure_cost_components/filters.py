@@ -3,7 +3,7 @@ import dash_bootstrap_components as dbc
 import pandas as pd
 
 def get_filters_layout():
-    filters_layout = dbc.Card(
+    filters_layout = dbc.Card([
         dbc.CardBody([
             dbc.Row([
                 dbc.Col([
@@ -105,6 +105,60 @@ def get_filters_layout():
                 ], width=4),                                              
             ], className="mb-2"),
         ]),
-        className="mb-3"
+        html.Hr(),
+        html.H5("Tag Based Filters"),
+        dbc.CardBody([
+            dbc.Row([
+                dbc.Col([
+                    html.Div([
+                        html.Label("Application Tag"),
+                        dcc.Dropdown(
+                            id="app-tag-dropdown", 
+                            options=[],
+                            placeholder="Select Application",
+                            multi=True,
+                            disabled=False
+                        )
+                    ], className="d-grid gap-1")
+                ], width=3), 
+                dbc.Col([
+                    html.Div([
+                        html.Label("Cost Center Tag"),
+                        dcc.Dropdown(
+                            id="costcenter-tag-dropdown", 
+                            options=[],
+                            placeholder="Select Cost Center",
+                            multi=True,
+                            disabled=False
+                        )
+                    ], className="d-grid gap-1")
+                ], width=3), 
+                dbc.Col([
+                    html.Div([
+                        html.Label("Product Tag"),
+                        dcc.Dropdown(
+                            id="product-tag-dropdown", 
+                            options=[],
+                            placeholder="Select Product",
+                            multi=True,
+                            disabled=False
+                        )
+                    ], className="d-grid gap-1")
+                ], width=3), 
+                dbc.Col([
+                    html.Div([
+                        html.Label("Project Tag"),
+                        dcc.Dropdown(
+                            id="project-tag-dropdown", 
+                            options=[],
+                            placeholder="Select Project",
+                            multi=True,
+                            disabled=False
+                        )
+                    ], className="d-grid gap-1")
+                ], width=3),                                              
+            ], className="mb-2"),
+        ]),        
+        ], className="mb-3"
     )    
     return filters_layout

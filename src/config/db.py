@@ -6,5 +6,3 @@ username = 'synapseadmin'
 password = 'Rec0reR0ck$'
 database = 'recore_ldw'
 engine = create_engine(f'mssql+pyodbc://{username}:{password}@{workspace}.sql.azuresynapse.net:1433/{database}?driver={driver}')
-print("DB Engine created")
-
