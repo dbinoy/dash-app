@@ -22,7 +22,13 @@ def register_callbacks(app):
                     case "UsageDay_To":
                         filtered_query += f"AND [UsageDay] <= CAST('{selections[k]}' AS DATE) "
                     case _:
-                        filtered_query += f"AND [{k}] IN ({selections[k]}) "
+                        if 'Unspecified' not in selections[k]:
+                            filtered_query += f"AND [{k}] IN ({selections[k]}) "
+                        else:
+                            filtered_query += f"AND [{k}] IS NULL "
+                            remaining_selections = selections[k].replace("'Unspecified',", ",").replace(", 'Unspecified'", ",").replace("'Unspecified'", "")
+                            if len(remaining_selections) > 0 :
+                                filtered_query += f"AND [{k}] IN ({remaining_selections}) "                      
 
         filtered_query += 'GROUP BY [SubscriptionName], [ResourceGroup], [Provider], [ServiceName], [ReservationId], [ResourceType], [UsageDay] '
 

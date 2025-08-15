@@ -23,7 +23,13 @@ def register_callbacks(app):
                     case "UsageDay_To":
                         where_clause = f"{where_clause} AND [BillingMonth] <= CAST('{selections[k]}' AS DATE)"
                     case _:
-                        where_clause = f"{where_clause} AND [{k}] IN ({selections[k]})"
+                        if 'Unspecified' not in selections[k]:
+                            where_clause = f"{where_clause} AND [{k}] IN ({selections[k]})"
+                        else:
+                            where_clause = f"{where_clause} AND [{k}] IS NULL"
+                            remaining_selections = selections[k].replace("'Unspecified',", ",").replace(", 'Unspecified'", ", ").replace("'Unspecified'", "")
+                            if len(remaining_selections) > 0 :
+                                where_clause = f"{where_clause} AND [{k}] IN ({remaining_selections})"                        
 
         q_cost_breakdown = f"SELECT {fields} FROM [consumable].{table_name} {where_clause} GROUP BY {group_by_clause} ORDER BY {group_by_clause}"
 

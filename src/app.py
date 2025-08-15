@@ -23,6 +23,9 @@ app.config.suppress_callback_exceptions = True
 server = app.server
 cache.init_app(server)
 
+with server.app_context():
+    cache.clear()
+    
 # Navigation bar
 navbar = dbc.NavbarSimple(
     children=[

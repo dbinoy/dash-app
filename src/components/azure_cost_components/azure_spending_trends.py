@@ -91,9 +91,9 @@ def get_azure_spending_trends_figure(df, time_aggregation, group_by):
                 markers=True
             )            
         else:
-            fig = px.line(title=f"{time_aggregation.capitaliza()} Cost Trends")
+            fig = px.line(title=f"{time_aggregation.capitalize()} Cost Trends")
     else:
-        fig = px.line(title=f"{time_aggregation.capitaliza()} Cost Trends")
+        fig = px.line(title=f"{time_aggregation.capitalize()} Cost Trends")
     fig.update_layout(
         xaxis_title=xaxis_title,
         yaxis_title="Cost (USD)",

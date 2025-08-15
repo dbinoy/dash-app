@@ -19,6 +19,7 @@ def register_azure_cost_filter_callbacks(app):
         q_unique_costcenter_tags = 'SELECT COALESCE([CostCenter], \'\') AS CostCenter, COALESCE([SubscriptionUsed], \'\') AS SubscriptionUsed, COALESCE([ResourceGroupUsed], \'\') AS ResourceGroupUsed FROM [consumable].[azure_tag_usages_CostCenter]'
         q_unique_product_tags = 'SELECT COALESCE([Product], \'\') AS Product, COALESCE([SubscriptionUsed], \'\') AS SubscriptionUsed, COALESCE([ResourceGroupUsed], \'\') AS ResourceGroupUsed FROM [consumable].[azure_tag_usages_Product]'
         q_unique_project_tags = 'SELECT COALESCE([Project], \'\') AS Project, COALESCE([SubscriptionUsed], \'\') AS SubscriptionUsed, COALESCE([ResourceGroupUsed], \'\') AS ResourceGroupUsed FROM [consumable].[azure_tag_usages_Project]'
+
         queries = {
             "earliest_and_latest_dates": q_earliest_and_latest_dates,
             "unique_tenants": q_unique_tenants,
@@ -262,7 +263,7 @@ def register_azure_cost_filter_callbacks(app):
         if not filter_data:
             return []
         
-        df_unique_app_tags = pd.DataFrame(filter_data["unique_app_tags"])   
+        df_unique_app_tags = pd.DataFrame(filter_data["unique_app_tags"]).replace('', 'Unspecified') 
         if selected_subscriptions and len(selected_subscriptions) != 0 and "All" not in selected_subscriptions:
             df_unique_app_tags = df_unique_app_tags[df_unique_app_tags['SubscriptionUsed'].apply(
                 lambda x: any(subscription.strip() in selected_subscriptions for subscription in x.split(',') if x is not None)
@@ -287,7 +288,7 @@ def register_azure_cost_filter_callbacks(app):
         if not filter_data:
             return []
         
-        df_unique_costcenter_tags = pd.DataFrame(filter_data["unique_costcenter_tags"])   
+        df_unique_costcenter_tags = pd.DataFrame(filter_data["unique_costcenter_tags"]).replace('', 'Unspecified')  
         if selected_subscriptions and len(selected_subscriptions) != 0 and "All" not in selected_subscriptions:
             df_unique_costcenter_tags = df_unique_costcenter_tags[df_unique_costcenter_tags['SubscriptionUsed'].apply(
                 lambda x: any(subscription.strip() in selected_subscriptions for subscription in x.split(',') if x is not None)
@@ -297,7 +298,6 @@ def register_azure_cost_filter_callbacks(app):
             df_unique_costcenter_tags = df_unique_costcenter_tags[df_unique_costcenter_tags['ResourceGroupUsed'].apply(
                 lambda x: any(resource.strip() in selected_resourcegroups for resource in x.split(',') if x is not None)
             )]             
-
         tag_options = [{"label": f"All Cost Centers", "value": "All"}]+[{"label": str(v), "value": v} for v in df_unique_costcenter_tags["CostCenter"].unique() if pd.notnull(v)]
         return tag_options    
         
@@ -312,7 +312,7 @@ def register_azure_cost_filter_callbacks(app):
         if not filter_data:
             return []
         
-        df_unique_product_tags = pd.DataFrame(filter_data["unique_product_tags"])   
+        df_unique_product_tags = pd.DataFrame(filter_data["unique_product_tags"]).replace('', 'Unspecified')    
         if selected_subscriptions and len(selected_subscriptions) != 0 and "All" not in selected_subscriptions:
             df_unique_product_tags = df_unique_product_tags[df_unique_product_tags['SubscriptionUsed'].apply(
                 lambda x: any(subscription.strip() in selected_subscriptions for subscription in x.split(',') if x is not None)
@@ -337,7 +337,7 @@ def register_azure_cost_filter_callbacks(app):
         if not filter_data:
             return []
         
-        df_unique_project_tags = pd.DataFrame(filter_data["unique_project_tags"])   
+        df_unique_project_tags = pd.DataFrame(filter_data["unique_project_tags"]).replace('', 'Unspecified')    
         if selected_subscriptions and len(selected_subscriptions) != 0 and "All" not in selected_subscriptions:
             df_unique_project_tags = df_unique_project_tags[df_unique_project_tags['SubscriptionUsed'].apply(
                 lambda x: any(subscription.strip() in selected_subscriptions for subscription in x.split(',') if x is not None)
@@ -403,9 +403,17 @@ def register_azure_cost_filter_callbacks(app):
         Input("service-dropdown", "value"),
         Input("reservation-dropdown", "value"),
         Input("resourcetype-dropdown", "value"),
+        Input("app-tag-dropdown", "value"),
+        Input("costcenter-tag-dropdown", "value"),
+        Input("product-tag-dropdown", "value"),
+        Input("project-tag-dropdown", "value"),        
         prevent_initial_call=True
     )
-    def filter_data_query(filter_data, start_date, end_date, selected_tenants, selected_subscriptions, selected_resourcegroups, selected_providers, selected_services, selected_reservations, selected_resourcetypes):
+    def filter_data_query(filter_data, start_date, end_date, 
+                          selected_tenants, selected_subscriptions, selected_resourcegroups, 
+                          selected_providers, selected_services, selected_reservations, selected_resourcetypes,
+                          selected_apps, selected_costcenters, selected_products, selected_projects):
+        
         df_earliest_and_latest_dates = pd.DataFrame(filter_data["earliest_and_latest_dates"])
         start_placeholder = df_earliest_and_latest_dates["EarliestDay"][0]
         end_placeholder = df_earliest_and_latest_dates["LatestDay"][0]        
@@ -418,7 +426,11 @@ def register_azure_cost_filter_callbacks(app):
             "Provider": ", ".join(["'"+provider+"'" for provider in selected_providers]) if selected_providers and len(selected_providers) > 0 and "All" not in selected_providers else "",
             "ServiceName": ", ".join(["'"+service+"'" for service in selected_services]) if selected_services and len(selected_services) > 0 and "All" not in selected_services else "",
             "ReservationId": ", ".join(["'"+reservation+"'" for reservation in selected_reservations]) if selected_reservations and len(selected_reservations) > 0 and "All" not in selected_reservations else "",
-            "ResourceType": ", ".join(["'"+resourcetype+"'" for resourcetype in selected_resourcetypes]) if selected_resourcetypes and len(selected_resourcetypes) > 0 and "All" not in selected_resourcetypes else ""
+            "ResourceType": ", ".join(["'"+resourcetype+"'" for resourcetype in selected_resourcetypes]) if selected_resourcetypes and len(selected_resourcetypes) > 0 and "All" not in selected_resourcetypes else "",
+            "App": ", ".join(["'"+app+"'" for app in selected_apps]) if selected_apps and len(selected_apps) > 0 and "All" not in selected_apps else "",
+            "CostCenter": ", ".join(["'"+costcenter+"'" for costcenter in selected_costcenters]) if selected_costcenters and len(selected_costcenters) > 0 and "All" not in selected_costcenters else "",
+            "Product": ", ".join(["'"+product+"'" for product in selected_products]) if selected_products and len(selected_products) > 0 and "All" not in selected_products else "",            
+            "Project": ", ".join(["'"+project+"'" for project in selected_projects]) if selected_projects and len(selected_projects) > 0 and "All" not in selected_projects else ""
         }
         return selections
     
@@ -442,7 +454,13 @@ def register_azure_cost_filter_callbacks(app):
                     case "UsageDay_To":
                         where_clause = f"{where_clause} AND [UsageDay] <= CAST('{selections[k]}' AS DATE)"
                     case _:
-                        where_clause = f"{where_clause} AND [{k}] IN ({selections[k]})"
+                        if 'Unspecified' not in selections[k]:
+                            where_clause = f"{where_clause} AND [{k}] IN ({selections[k]})"
+                        else:
+                            where_clause = f"{where_clause} AND [{k}] IS NULL"
+                            remaining_selections = selections[k].replace("'Unspecified',", ",").replace(", 'Unspecified'", ", ").replace("'Unspecified'", "")
+                            if len(remaining_selections) > 0 :
+                                where_clause = f"{where_clause} AND [{k}] IN ({remaining_selections})"
 
         q_table_data_query = f"{select_clause} {where_clause} {group_by_clause}"
         queries = {
