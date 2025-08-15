@@ -55,19 +55,19 @@ def register_callbacks(app):
         most_expensive_subscription = results["most_expensive_subscription"].iloc[0]["SubscriptionName"] if not results["most_expensive_subscription"].empty else "N/A"
 
         if total_cost is not None and total_cost > 0:
-            total_cost = f"${total_cost:,.2f}"
+            total_cost = f"${total_cost:,.0f}"
         else:
             total_cost = ""      
         
         cost_variance = stdev_cost / avg_daily_cost if avg_daily_cost and avg_daily_cost > 0 and stdev_cost and stdev_cost > 0 else 0
 
         if avg_daily_cost is not None and avg_daily_cost > 0:
-            avg_daily_cost = f"${avg_daily_cost:,.2f}"
+            avg_daily_cost = f"${avg_daily_cost:,.0f}"
         else:
             avg_daily_cost = "$0.00"
 
         if max_daily_cost is not None and max_daily_cost > 0:
-            max_daily_cost = f"${max_daily_cost:,.2f}"
+            max_daily_cost = f"${max_daily_cost:,.0f}"
         else:
             max_daily_cost = "$0.00"
 
