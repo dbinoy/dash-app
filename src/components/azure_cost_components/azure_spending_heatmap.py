@@ -78,13 +78,7 @@ def get_spending_heatmap_figure(df, top_n, selected_subscriptions, selected_serv
     else:
         if len(subscription_options) > 0 and "All" not in subscription_options:        
             df = df[df["SubscriptionName"].isin(subscription_options)]  
-    # print(f"Time Period: {time_period}")
-    # print(f"Top N for heatmap: {top_n}")
-    # print(f"Selected Subscriptions: {selected_subscriptions}")
-    # print(f"Selected Services: {selected_services}")
-    # print(f"Subscription Options: {subscription_options}")
-    # print(f"Service Options: {service_options}")
-    # print(f"DataFrame for heatmap: {df.head(20)}")
+
     if df is not None and (not df.empty) and f"TotalCost" in df.columns and f"UsageDay" in df.columns: 
         match time_period:
             case 'daily':

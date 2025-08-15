@@ -11,7 +11,7 @@ def register_callbacks(app):
     def update_data_table(selections):
 
         q_azure_cost_data = 'SELECT [UsageDay], [SubscriptionName], [ResourceGroup], [Provider], [ServiceName], [ReservationId], [ResourceType], SUM([TotalCostUSD]) as TotalCost ' \
-        'FROM consumable.azure_daily_cost_by_tenant_subscriptionname_resourcegroup_provider_servicename_reservationid_resourcetype '
+        'FROM consumable.d_cost_by_tenant_sub_rg_provider_service_reservation_type_app_costcenter_product_project '
 
         filtered_query = "WHERE 1=1 "
         for k in selections.keys():
@@ -37,6 +37,7 @@ def register_callbacks(app):
         queries = {
             "azure_cost_data": q_azure_cost_data
         }
+
         results = run_queries(queries, len(queries.keys()))
         df = results["azure_cost_data"]
         return get_data_table_data(df)    

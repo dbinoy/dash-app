@@ -428,7 +428,7 @@ def register_azure_cost_filter_callbacks(app):
         prevent_initial_call=True
     )
     def fetch_table_data(selections):
-        table_name = f"[azure_daily_cost_by_tenant_subscriptionname_resourcegroup_provider_servicename_reservationid_resourcetype]"
+        table_name = f"[d_cost_by_tenant_sub_rg_provider_service_reservation_type_app_costcenter_product_project]"
         fields = "[UsageDay], [SubscriptionName], [ResourceGroup], [ServiceName], [ReservationId]"
         select_clause = f"SELECT {fields}, SUM([TotalCostUSD]) as TotalCost FROM [consumable].{table_name}"
         group_by_clause = f"GROUP BY {fields}"

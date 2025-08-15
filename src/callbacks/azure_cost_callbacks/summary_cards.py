@@ -4,7 +4,7 @@ from datetime import datetime
 from src.utils.db import run_queries
 from src.components.azure_cost_components.summary_cards import get_summary_cards_layout
 
-def create_query_filter(selections, table_name="azure_daily_cost_by_tenant_subscriptionname_resourcegroup_provider_servicename_reservationid_resourcetype", include_date=True, use_keys = []):
+def create_query_filter(selections, table_name="d_cost_by_tenant_sub_rg_provider_service_reservation_type_app_costcenter_product_project", include_date=True, use_keys = []):
     query = f" FROM consumable.{table_name} WHERE 1=1"
     for k in selections.keys():
         if selections[k] and selections[k] != "All":
@@ -33,7 +33,7 @@ def register_callbacks(app):
         q_unique_resources = 'SELECT SUM(UniqueResources) AS UniqueResourceCount' + create_query_filter(selections, "azure_unique_resource_counts", False)
         q_most_expensive_subscription = f'''
         WITH DailyTotals as(SELECT Tenant, SubscriptionName, SUM(TotalCostUSD) DailyCost 
-        {create_query_filter(selections, "azure_daily_cost_by_tenant_subscriptionname", False, ["Tenant","SubscriptionName"])} 
+        {query_filter} 
         GROUP BY Tenant, SubscriptionName) SELECT SubscriptionName FROM DailyTotals WHERE DailyCost = (SELECT MAX(DailyCost) from DailyTotals)
         '''
 
