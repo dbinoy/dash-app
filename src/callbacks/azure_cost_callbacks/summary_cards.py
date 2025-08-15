@@ -16,7 +16,13 @@ def create_query_filter(selections, table_name="d_cost_by_tenant_sub_rg_provider
                     query += f" AND [UsageDay] <= CAST('{selections[k]}' AS DATE)"
             else:
                 if len(use_keys) == 0 or k in use_keys:
-                    query += f" AND [{k}] IN ({selections[k]})"
+                    if 'Unspecified' not in selections[k]:
+                        query += f" AND [{k}] IN ({selections[k]})"
+                    else:
+                        query += f" AND [{k}] IS NULL "
+                        remaining_selections = selections[k].replace("'Unspecified',", ",").replace(", 'Unspecified'", ", ").replace("'Unspecified'", "")
+                        if len(remaining_selections) > 0 :
+                            query += f" AND [{k}] IN ({remaining_selections})"
     return query
     
 def register_callbacks(app):
